@@ -1,0 +1,17 @@
+# Workspace-wide analysis. The analyzer walks up the directory tree, so this
+# single file governs every package and example under the repo root.
+analyzer:
+  language:
+    strict-casts: true
+    strict-raw-types: true
+  errors:
+    todo: ignore
+
+linter:
+  rules:
+    - prefer_single_quotes
+    - prefer_final_locals
+    - prefer_final_in_for_each
+    - unnecessary_this
+    - directives_ordering
+    - avoid_relative_lib_imports

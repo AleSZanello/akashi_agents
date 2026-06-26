@@ -1,0 +1,47 @@
+name: akashi_workspace
+description: >-
+  Akashi Agents monorepo — a provider-neutral, multi-agent + durable agent
+  framework for Dart & Flutter.
+publish_to: none
+
+environment:
+  sdk: ^3.6.0
+
+# Dart pub workspace: one shared lockfile, resolved together.
+# https://dart.dev/tools/pub/workspaces
+workspace:
+  - packages/akashi
+  - packages/akashi_google
+  - packages/akashi_gen
+  - packages/akashi_openai
+  - packages/akashi_anthropic
+  - packages/akashi_ollama
+  - packages/akashi_gemma
+  - packages/akashi_mcp
+  - packages/akashi_gateway
+  - packages/akashi_otel
+  - packages/akashi_drift
+  - packages/akashi_flutter
+  - examples/cli_quickstart
+  - examples/production_agent
+
+dev_dependencies:
+  melos: ^8.0.0
+
+# Melos 7+ reads its config from the workspace root pubspec under `melos:`.
+melos:
+  scripts:
+    analyze:
+      description: Statically analyze every package.
+      exec: dart analyze .
+    format:
+      description: Format all Dart sources.
+      exec: dart format .
+    format-check:
+      description: Verify formatting without writing changes.
+      exec: dart format --output=none --set-exit-if-changed .
+    test:
+      description: Run tests in every package that has a test/ directory.
+      exec: dart test
+      packageFilters:
+        dirExists: test

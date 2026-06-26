@@ -1,0 +1,21 @@
+# Dart / Pub
+.dart_tool/
+.packages
+build/
+pubspec.lock
+
+# Melos
+.melos_tool/
+
+# IDE / OS
+.idea/
+*.iml
+.vscode/
+.DS_Store
+
+# Env
+.env
+*.env.local
+
+# Local planning / specs (not committed)
+/specs/

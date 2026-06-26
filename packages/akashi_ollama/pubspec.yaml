@@ -1,0 +1,14 @@
+name: akashi_ollama
+description: >-
+  Ollama provider adapter for the Akashi agent framework. Wraps ollama_dart
+  behind Akashi's LanguageModel contract. Roadmap stub for v0.2.
+version: 0.0.1
+publish_to: none
+
+environment:
+  sdk: ^3.6.0
+
+resolution: workspace
+
+dependencies:
+  akashi: ^0.2.0

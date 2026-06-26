@@ -1,0 +1,16 @@
+name: cli_quickstart
+description: >-
+  Akashi quickstart — a streaming Gemini agent that calls a typed tool and
+  stops via a composable stop condition.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.6.0
+
+resolution: workspace
+
+dependencies:
+  akashi: ^0.2.0
+  akashi_gateway: ^0.2.0
+  akashi_google: ^0.2.0

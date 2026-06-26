@@ -1,0 +1,27 @@
+name: akashi_mcp
+description: >-
+  Model Context Protocol (MCP) tools for the Akashi agent framework. Connects to
+  an MCP server via the official dart_mcp client and exposes its tools as Akashi
+  tools an agent can call.
+version: 0.2.0
+repository: https://github.com/Alezanello/akashi_agents/tree/main/packages/akashi_mcp
+issue_tracker: https://github.com/Alezanello/akashi_agents/issues
+topics:
+  - ai
+  - agents
+  - llm
+  - mcp
+
+environment:
+  sdk: ^3.7.0
+
+resolution: workspace
+
+dependencies:
+  akashi: ^0.2.0
+  dart_mcp: ^0.2.2
+  meta: ^1.16.0
+  stream_channel: ^2.1.4
+
+dev_dependencies:
+  test: ^1.25.0

@@ -1,0 +1,15 @@
+name: akashi_gemma
+description: >-
+  On-device provider for the Akashi agent framework. Wraps flutter_gemma to run
+  agents against local models, proving the LanguageModel contract is not
+  HTTP-bound. Roadmap stub for v0.3.
+version: 0.0.1
+publish_to: none
+
+environment:
+  sdk: ^3.6.0
+
+resolution: workspace
+
+dependencies:
+  akashi: ^0.2.0

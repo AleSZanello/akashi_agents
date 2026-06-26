@@ -1,0 +1,27 @@
+name: akashi
+description: >-
+  Provider-neutral core for the Akashi agent framework: streaming tool-loop
+  agents, typed tools with dependency injection, sealed message/event unions,
+  and seams for multi-agent orchestration and durable execution. Pure Dart.
+version: 0.2.0
+repository: https://github.com/Alezanello/akashi_agents/tree/main/packages/akashi
+issue_tracker: https://github.com/Alezanello/akashi_agents/issues
+topics:
+  - ai
+  - agents
+  - llm
+  - genai
+
+environment:
+  sdk: ^3.6.0
+
+resolution: workspace
+
+dependencies:
+  async: ^2.11.0
+  fetch_client: ^1.2.0
+  http: ^1.2.0
+  meta: ^1.15.0
+
+dev_dependencies:
+  test: ^1.25.0

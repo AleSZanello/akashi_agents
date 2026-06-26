@@ -1,0 +1,18 @@
+builders:
+  schema:
+    import: 'package:akashi_gen/builder.dart'
+    builder_factories: ['schemaBuilder']
+    build_extensions:
+      '.dart':
+        - '.akashi_gen.g.part'
+    auto_apply: dependents
+    build_to: cache
+    applies_builders: ['source_gen:combining_builder']
+
+# Apply the builder to this package's own example, so its committed
+# `.g.dart` can be regenerated with `dart run build_runner build`.
+targets:
+  $default:
+    builders:
+      akashi_gen|schema:
+        enabled: true

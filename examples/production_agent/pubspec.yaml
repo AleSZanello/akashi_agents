@@ -1,0 +1,22 @@
+name: production_agent
+description: >-
+  Akashi v0.2 combined example — a single agent wired with provider routing
+  (ProviderRegistry), structured output, an OpenTelemetry tracer, an approval
+  gate, and an in-memory checkpoint store. Runs offline with a scripted model
+  when no API keys are set.
+version: 0.2.0
+publish_to: none
+
+environment:
+  sdk: ^3.9.0
+
+resolution: workspace
+
+dependencies:
+  akashi: ^0.2.0
+  akashi_anthropic: ^0.2.0
+  akashi_gateway: ^0.2.0
+  akashi_google: ^0.2.0
+  akashi_openai: ^0.2.0
+  akashi_otel: ^0.2.0
+  opentelemetry: ^0.18.11

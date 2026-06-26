@@ -1,0 +1,15 @@
+name: akashi_drift
+description: >-
+  Durable SQLite checkpoint store for the Akashi agent framework. Implements
+  Akashi's CheckpointStore over drift for resume and human-in-the-loop pauses.
+  Roadmap stub for v0.3.
+version: 0.0.1
+publish_to: none
+
+environment:
+  sdk: ^3.6.0
+
+resolution: workspace
+
+dependencies:
+  akashi: ^0.2.0

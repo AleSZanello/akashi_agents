@@ -1,0 +1,27 @@
+name: akashi_google
+description: >-
+  Google Gemini provider adapter for the Akashi agent framework. Wraps
+  googleai_dart behind Akashi's LanguageModel contract, normalizing streamed
+  content and function calls into Akashi's ModelStreamPart union.
+version: 0.2.0
+repository: https://github.com/Alezanello/akashi_agents/tree/main/packages/akashi_google
+issue_tracker: https://github.com/Alezanello/akashi_agents/issues
+topics:
+  - ai
+  - agents
+  - llm
+  - gemini
+
+environment:
+  sdk: ^3.6.0
+
+resolution: workspace
+
+dependencies:
+  akashi: ^0.2.0
+  googleai_dart: ^8.0.0
+  meta: ^1.15.0
+
+dev_dependencies:
+  http: ^1.2.0
+  test: ^1.25.0

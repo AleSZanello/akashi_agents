@@ -1,0 +1,27 @@
+name: akashi_anthropic
+description: >-
+  Anthropic (Claude) provider adapter for the Akashi agent framework. Wraps
+  anthropic_sdk_dart behind Akashi's LanguageModel contract, normalizing
+  content blocks (text, thinking, tool_use) into Akashi's ModelStreamPart union.
+version: 0.2.0
+repository: https://github.com/Alezanello/akashi_agents/tree/main/packages/akashi_anthropic
+issue_tracker: https://github.com/Alezanello/akashi_agents/issues
+topics:
+  - ai
+  - agents
+  - llm
+  - anthropic
+
+environment:
+  sdk: ^3.9.0
+
+resolution: workspace
+
+dependencies:
+  akashi: ^0.2.0
+  anthropic_sdk_dart: ^5.0.0
+  meta: ^1.16.0
+
+dev_dependencies:
+  http: ^1.2.0
+  test: ^1.25.0

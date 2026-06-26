@@ -1,0 +1,15 @@
+name: akashi_flutter
+description: >-
+  Flutter integration for the Akashi agent framework: reactive agent
+  controllers, builder widgets, approval-dialog plumbing, and Isolate offload.
+  Roadmap stub for v0.3.
+version: 0.0.1
+publish_to: none
+
+environment:
+  sdk: ^3.6.0
+
+resolution: workspace
+
+dependencies:
+  akashi: ^0.2.0
