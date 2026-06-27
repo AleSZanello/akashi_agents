@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  # The pure-Dart pub workspace (core + cloud adapters + examples).
+  dart-workspace:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+      - run: dart pub get
+      - run: dart pub global activate melos
+      - run: melos run analyze
+      - run: melos run format-check
+      - run: melos run test
+
+  # akashi_drift resolves standalone (drift_dev conflicts with melos over
+  # cli_util) and needs build_runner codegen — pure Dart, run under `dart`.
+  akashi_drift:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/akashi_drift
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+      - run: dart pub get
+      - run: dart run build_runner build
+      - run: dart analyze
+      - run: dart format --output=none --set-exit-if-changed .
+      - run: dart test
+
+  # The Flutter packages depend on the Flutter SDK — run under Flutter tooling.
+  flutter-packages:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        package: [akashi_flutter, akashi_gemma]
+    defaults:
+      run:
+        working-directory: packages/${{ matrix.package }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: dart format --output=none --set-exit-if-changed .
+      - run: flutter test

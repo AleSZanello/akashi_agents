@@ -22,32 +22,40 @@ classes + exhaustive `switch`** for message/event modelling, and uses
 
 ## Status
 
-🚧 **v0.2 — production single-agent.** Beyond the v0.1 core, this milestone adds
-reliable structured output (provider-native JSON schema → tool mode → prompt,
-with a validate/repair safety net), `prepareStep` context helpers, in-memory
-checkpoints + resume, in-process human-in-the-loop approval, embeddings, parallel
-tool execution, OpenTelemetry tracing, MCP tools, optional `build_runner`
-codegen, cross-platform (web) streaming, and OpenAI + Anthropic adapters
-alongside Gemini — all provider-neutral and offline-tested. Multi-agent
-orchestration, durable cross-process execution, and Flutter integration (v0.3)
-are next.
+🚧 **v0.3 — multi-agent · durable · Flutter-native.** Akashi's three
+differentiating pillars, the lanes Genkit Dart (flow/server-first) under-serves:
+
+- **Multi-agent orchestration** — subagent-as-tool (`Agent.asTool`), control
+  **handoffs** (`transfer_to_<name>`), and first-class model **escalation**
+  policies.
+- **Durable execution** — versioned `Message`/`Part` serialization, a SQLite
+  `DriftCheckpointStore`, and durable human-in-the-loop: a run **suspends**
+  (persists + throws `Suspended`) on approval and **resumes** across processes.
+- **Flutter-native** — a reactive `AgentController` (the agent's `ApprovalHandler`),
+  `AgentBuilder`, a message renderer, and Isolate offload — plus on-device models
+  via `akashi_gemma` (proving `LanguageModel` is not HTTP-bound).
+
+Built on the v0.2 foundation: provider-native structured output, `prepareStep`
+context helpers, in-memory checkpoints, in-process HITL, embeddings, parallel
+tools, OpenTelemetry, MCP, codegen, cross-platform streaming, and Gemini +
+OpenAI + Anthropic adapters — all provider-neutral and offline-tested.
 
 ## Monorepo layout
 
 | Package | Status | Purpose |
 |---|---|---|
-| [`akashi`](packages/akashi) | v0.2 | Pure-Dart core: agent loop, tools, schema, sealed message/event unions, provider + embedding contracts, structured-output strategy, context helpers, in-memory checkpoints + HITL, parallel tools, cross-platform SSE. No provider SDKs. |
+| [`akashi`](packages/akashi) | v0.3 | Pure-Dart core: agent loop, tools, schema, sealed message/event unions, provider + embedding contracts, structured output, context helpers, parallel tools, cross-platform SSE. **v0.3:** subagent-as-tool, handoffs, escalation policies, Message/Part serialization, durable suspend/resume HITL. No provider SDKs. |
 | [`akashi_google`](packages/akashi_google) | v0.2 | Gemini adapter over `googleai_dart` — structured output, tool choice, embeddings. |
 | [`akashi_openai`](packages/akashi_openai) | v0.2 | OpenAI adapter over `openai_dart`. |
 | [`akashi_anthropic`](packages/akashi_anthropic) | v0.2 | Anthropic adapter over `anthropic_sdk_dart` (thinking + tool_use). |
 | [`akashi_gateway`](packages/akashi_gateway) | v0.2 | Model routing (`provider/model` strings) + `FallbackModel` + embedding routing. |
-| [`akashi_mcp`](packages/akashi_mcp) | v0.2 | Model Context Protocol tools over `dart_mcp`. |
+| [`akashi_mcp`](packages/akashi_mcp) | v0.3 | Model Context Protocol tools over `dart_mcp` 0.5. |
 | [`akashi_otel`](packages/akashi_otel) | v0.2 | OpenTelemetry tracing exporter. |
 | [`akashi_gen`](packages/akashi_gen) | v0.2 | Optional `build_runner` codegen for tool input schemas. |
+| [`akashi_drift`](packages/akashi_drift) | v0.3 | Durable SQLite `CheckpointStore` over `drift` (suspend/resume across processes). Resolves standalone. |
+| [`akashi_flutter`](packages/akashi_flutter) | v0.3 | Reactive `AgentController` + `AgentBuilder` + message renderer + Isolate offload. Flutter SDK. |
+| [`akashi_gemma`](packages/akashi_gemma) | v0.3 | On-device `LanguageModel` over `flutter_gemma` (normalization testable offline). Flutter SDK. |
 | `akashi_ollama` | stub | Ollama adapter over `ollama_dart`. |
-| `akashi_gemma` | stub (v0.3) | On-device inference over `flutter_gemma`. |
-| `akashi_drift` | stub (v0.3) | Durable SQLite checkpoint store over `drift`. |
-| `akashi_flutter` | stub (v0.3) | Reactive controllers, widgets, Isolate offload. |
 | [`examples/cli_quickstart`](examples/cli_quickstart) | v0.1 | Streaming Gemini agent that calls a typed tool. |
 | [`examples/production_agent`](examples/production_agent) | v0.2 | Combined example: provider routing, structured output, OTel tracing, approval gate, checkpoints. |
 
@@ -86,14 +94,21 @@ dart analyze              # analyze everything
 melos run test            # run all package tests
 ```
 
+`akashi_drift`, `akashi_flutter`, and `akashi_gemma` resolve **standalone** (own
+lockfile, `akashi` path-overridden) — `akashi_drift`'s `drift_dev` conflicts with
+melos over `cli_util`, and the two Flutter packages need the Flutter SDK. Build
+them in their own directories (`dart`/`flutter` respectively); CI runs them as
+separate jobs (see `.github/workflows/ci.yaml`).
+
 ## Roadmap
 
 - **v0.1** — core + Gemini adapter + CLI demo (the vertical slice).
 - **v0.2** — structured output + self-repair, `prepareStep`, codegen, OpenAI/
   Anthropic adapters, MCP, OTel, embeddings, parallel tools, cross-platform
-  streaming, in-memory checkpoints + HITL. ← *here*
-- **v0.3** — multi-agent (subagent-as-tool, handoffs), durable checkpoints,
-  Flutter integration, on-device Gemma.
+  streaming, in-memory checkpoints + HITL.
+- **v0.3** — multi-agent (subagent-as-tool, handoffs, escalation), durable
+  execution (`akashi_drift` + suspend/resume HITL), Flutter integration
+  (`akashi_flutter`), on-device Gemma (`akashi_gemma`). ← *here*
 
 ## License
 

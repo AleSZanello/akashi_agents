@@ -1,15 +1,35 @@
 name: akashi_drift
 description: >-
   Durable SQLite checkpoint store for the Akashi agent framework. Implements
-  Akashi's CheckpointStore over drift for resume and human-in-the-loop pauses.
-  Roadmap stub for v0.3.
-version: 0.0.1
-publish_to: none
+  Akashi's CheckpointStore over drift, persisting agent state so a run can
+  resume and pause for durable human-in-the-loop approval across process
+  restarts.
+version: 0.3.0
+repository: https://github.com/Alezanello/akashi_agents/tree/main/packages/akashi_drift
+issue_tracker: https://github.com/Alezanello/akashi_agents/issues
+topics:
+  - ai
+  - agents
+  - durability
+  - sqlite
 
 environment:
-  sdk: ^3.6.0
+  sdk: ^3.9.0
 
-resolution: workspace
-
+# Standalone resolution (not a workspace member): drift_dev's toolchain
+# conflicts with the root melos over cli_util, so this package resolves on its
+# own and overrides `akashi` onto the local source.
 dependencies:
-  akashi: ^0.2.0
+  akashi: ^0.3.0
+  drift: ^2.20.0
+  meta: ^1.16.0
+  sqlite3: ^2.4.0
+
+dev_dependencies:
+  build_runner: ^2.4.0
+  drift_dev: ^2.20.0
+  test: ^1.25.0
+
+dependency_overrides:
+  akashi:
+    path: ../akashi

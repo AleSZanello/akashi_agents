@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:akashi/akashi.dart';
 import 'package:dart_mcp/client.dart' as mcp;
+import 'package:dart_mcp/stdio.dart' as mcp_stdio;
 import 'package:stream_channel/stream_channel.dart';
 
 /// Connects to a Model Context Protocol (MCP) server and exposes its tools as
@@ -19,9 +22,12 @@ import 'package:stream_channel/stream_channel.dart';
 /// and calling it proxies a `tools/call` to the server. Tools the server flags
 /// with a `destructiveHint` annotation are surfaced as needing approval.
 final class McpToolset<TDeps> {
-  McpToolset._(this._client, this.connection, this.tools);
+  McpToolset._(this._client, this.connection, this.tools, [this._process]);
 
   final mcp.MCPClient _client;
+
+  /// The spawned server process (stdio transport only); killed on [close].
+  final Process? _process;
 
   /// The underlying MCP server connection.
   final mcp.ServerConnection connection;
@@ -49,21 +55,35 @@ final class McpToolset<TDeps> {
     required String command,
     List<String> args = const [],
     String clientName = 'akashi',
-    String clientVersion = '0.2.0',
+    String clientVersion = '0.3.0',
   }) async {
+    // dart_mcp 0.5 no longer spawns the process itself: start it and bridge its
+    // stdout/stdin into a newline-delimited JSON-RPC channel.
+    final process = await Process.start(command, args);
+    final channel = mcp_stdio.stdioChannel(
+      input: process.stdout,
+      output: process.stdin,
+    );
     final client = mcp.MCPClient(
       mcp.Implementation(name: clientName, version: clientVersion),
     );
-    final connection = await client.connectStdioServer(command, args);
-    return _initialize<TDeps>(client, connection, clientName, clientVersion);
+    final connection = client.connectServer(channel);
+    return _initialize<TDeps>(
+      client,
+      connection,
+      clientName,
+      clientVersion,
+      process,
+    );
   }
 
   static Future<McpToolset<TDeps>> _initialize<TDeps>(
     mcp.MCPClient client,
     mcp.ServerConnection connection,
     String clientName,
-    String clientVersion,
-  ) async {
+    String clientVersion, [
+    Process? process,
+  ]) async {
     await connection.initialize(
       mcp.InitializeRequest(
         protocolVersion: mcp.ProtocolVersion.latestSupported,
@@ -79,11 +99,14 @@ final class McpToolset<TDeps> {
     final tools = [
       for (final tool in listing.tools) _wrap<TDeps>(connection, tool),
     ];
-    return McpToolset._(client, connection, tools);
+    return McpToolset._(client, connection, tools, process);
   }
 
   /// Shut down the connection (and, for stdio, the server process).
-  Future<void> close() => _client.shutdown();
+  Future<void> close() async {
+    await _client.shutdown();
+    _process?.kill();
+  }
 }
 
 Tool<TDeps> _wrap<TDeps>(mcp.ServerConnection connection, mcp.Tool mcpTool) {

@@ -11,9 +11,11 @@ import '../util/cancellation.dart';
 import 'agent.dart';
 import 'approval.dart';
 import 'checkpoint.dart';
+import 'handoff.dart';
 import 'prepare_step.dart';
 import 'results.dart';
 import 'stop_condition.dart';
+import 'suspend.dart';
 
 /// The default [Agent]: a streaming tool loop over a [LanguageModel].
 ///
@@ -33,7 +35,9 @@ final class ToolLoopAgent<TDeps> implements Agent<TDeps> {
   ToolLoopAgent({
     required this.model,
     this.instructions,
+    this.name,
     this.tools = const [],
+    this.handoffs = const [],
     List<StopCondition>? stopWhen,
     this.prepareStep,
     this.approvalHandler,
@@ -41,6 +45,7 @@ final class ToolLoopAgent<TDeps> implements Agent<TDeps> {
     this.tracer = const NoopTracer(),
     this.maxSteps = 16,
     this.parallelToolCalls = true,
+    this.durableApproval = false,
   }) : stopWhen = stopWhen ?? <StopCondition>[stepCountIs(maxSteps)];
 
   /// The language model that drives the loop.
@@ -49,8 +54,17 @@ final class ToolLoopAgent<TDeps> implements Agent<TDeps> {
   /// System instructions, prepended as a [SystemMessage] when none is present.
   final String? instructions;
 
+  /// An optional name identifying this agent, surfaced as [HandoffEvent.from]
+  /// when this agent transfers control. Defaults to `'agent'` when null.
+  final String? name;
+
   /// The tools the model may call.
   final List<Tool<TDeps>> tools;
+
+  /// Optional handoff targets this agent can transfer control to. Each is
+  /// advertised to the model as a `transfer_to_<name>` tool. Empty by default,
+  /// so a single-agent loop behaves exactly as before.
+  final List<Handoff<TDeps>> handoffs;
 
   /// Stop conditions, evaluated with OR semantics after each step.
   final List<StopCondition> stopWhen;
@@ -78,6 +92,14 @@ final class ToolLoopAgent<TDeps> implements Agent<TDeps> {
   /// tools one at a time, in order.
   final bool parallelToolCalls;
 
+  /// Use durable (suspend/resume) human-in-the-loop instead of the in-process
+  /// [approvalHandler]. Active only when a [checkpoints] store is also
+  /// configured. When on, a tool needing approval persists a suspended
+  /// checkpoint and throws [Suspended]; resume out of band with
+  /// [resume] passing an [ApprovalDecision]. Off by default — the in-process
+  /// approval path is unchanged.
+  final bool durableApproval;
+
   @override
   Stream<AgentEvent> stream(
     Object prompt, {
@@ -91,14 +113,21 @@ final class ToolLoopAgent<TDeps> implements Agent<TDeps> {
   /// Resume a checkpointed run from its persisted state.
   ///
   /// Loads the latest [AgentCheckpoint] for [checkpointId] from the configured
-  /// [checkpoints] store and continues the loop from the next step, preserving
-  /// the prior message history. Throws a [StateError] when no store is
-  /// configured or no checkpoint exists for the id.
+  /// [checkpoints] store. Throws a [StateError] when no store is configured or
+  /// no checkpoint exists for the id.
+  ///
+  /// With no [decision] this is a plain resume: the loop continues from the next
+  /// step, preserving the prior message history (unchanged from v0.2). Pass a
+  /// [decision] to resume a durable human-in-the-loop pause (a checkpoint with
+  /// status [CheckpointStatus.suspended]): the loop re-enters the suspended step
+  /// and applies the decision to the pending tool call — approved → execute,
+  /// rejected → an error result fed back to the model.
   ///
   /// This is in addition to the [Agent] interface (not part of it), so existing
   /// implementers are unaffected.
   Stream<AgentEvent> resume(
     String checkpointId, {
+    ApprovalDecision? decision,
     TDeps? deps,
     RunOptions? options,
   }) async* {
@@ -111,12 +140,34 @@ final class ToolLoopAgent<TDeps> implements Agent<TDeps> {
     if (checkpoint == null) {
       throw StateError('No checkpoint found for run "$checkpointId".');
     }
+
+    if (decision == null) {
+      yield* _run(
+        checkpoint.messages,
+        startStep: checkpoint.step + 1,
+        deps: deps,
+        opts: options ?? const RunOptions(),
+        checkpointId: checkpointId,
+      );
+      return;
+    }
+
+    final pending = checkpoint.pendingApproval;
+    if (checkpoint.status != CheckpointStatus.suspended || pending == null) {
+      throw StateError(
+          'Checkpoint "$checkpointId" is not awaiting an approval decision.');
+    }
     yield* _run(
       checkpoint.messages,
-      startStep: checkpoint.step + 1,
+      startStep: checkpoint.step,
       deps: deps,
       opts: options ?? const RunOptions(),
       checkpointId: checkpointId,
+      resume: _DurableResume<TDeps>(
+        pendingCall: pending,
+        resolved: checkpoint.resolvedResults,
+        decision: decision,
+      ),
     );
   }
 
@@ -128,6 +179,7 @@ final class ToolLoopAgent<TDeps> implements Agent<TDeps> {
     required TDeps? deps,
     required RunOptions opts,
     String? checkpointId,
+    _DurableResume<TDeps>? resume,
   }) async* {
     final cancel = opts.cancel ?? CancellationToken();
     final rootSpan = tracer.startSpan('agent.run');
@@ -136,6 +188,17 @@ final class ToolLoopAgent<TDeps> implements Agent<TDeps> {
     final steps = <StepResult>[];
     var totalUsage = Usage.zero;
     var step = startStep;
+
+    // The mutable "active agent" config. A handoff reassigns these fields to the
+    // target agent while [history] carries across; with no handoffs they stay
+    // equal to the constructor values and the loop is unchanged.
+    final active = _Active<TDeps>(
+      name: name ?? 'agent',
+      model: model,
+      instructions: instructions,
+      tools: tools,
+      handoffs: handoffs,
+    );
 
     yield RunStart(step);
 
@@ -147,89 +210,116 @@ final class ToolLoopAgent<TDeps> implements Agent<TDeps> {
         return;
       }
 
-      // 1. Context engineering hook (no-op unless configured).
-      final cfg = prepareStep == null
-          ? null
-          : await prepareStep!(StepContext<TDeps>(
-              step: step,
-              messages: history,
-              deps: deps as TDeps,
-            ));
-      final activeMessages = cfg?.messages ?? history;
-      final activeModel = cfg?.model ?? model;
-      final activeTools = _resolveTools(cfg?.activeTools);
+      // On a durable-approval resume, the suspended step's model turn already
+      // ran — its assistant message is the last in the rehydrated history — so
+      // we skip phases 1–3 and re-enter directly at tool execution.
+      final reentry = resume != null && step == startStep;
 
       yield StepStart(step);
       final stepSpan = tracer.startSpan('agent.step',
-          parent: rootSpan, attributes: {'step': step});
+          parent: rootSpan,
+          attributes: {'step': step, if (reentry) 'resumed': true});
 
-      // 2. Call the model, re-emitting deltas and accumulating the turn.
-      final acc = _StepAccumulator();
-      final request = ModelRequest(
-        messages: activeMessages,
-        tools: [for (final t in activeTools) t.spec],
-        toolChoice: cfg?.toolChoice ?? ToolChoice.auto,
-        responseFormat: opts.responseFormat ?? ResponseFormat.text,
-        temperature: opts.temperature,
-        maxOutputTokens: opts.maxOutputTokens,
-        cancel: cancel,
-      );
+      final List<ToolCallPart> calls;
+      final String stepText;
+      final FinishReason stepFinishReason;
+      final Usage stepUsage;
 
-      await for (final part in activeModel.stream(request)) {
-        switch (part) {
-          case TextDeltaPart(:final text):
-            acc.text.write(text);
-            yield TextDelta(step, text);
-          case ReasoningDeltaPart(:final text, :final signature):
-            acc.reasoning.write(text);
-            if (signature != null) acc.reasoningSignature = signature;
-            yield ReasoningDelta(step, text);
-          case ToolCallStartPart(:final toolCallId, :final toolName):
-            acc.openCall(toolCallId, toolName);
-            yield ToolCallStart(step,
-                toolCallId: toolCallId, toolName: toolName);
-          case ToolCallDeltaPart(:final toolCallId, :final argsDelta):
-            acc.appendArgs(toolCallId, argsDelta);
-            yield ToolCallArgsDelta(step,
-                toolCallId: toolCallId, argsDelta: argsDelta);
-          case ToolCallCompletePart(
-              :final toolCallId,
-              :final toolName,
-              :final input
-            ):
-            acc.completeCall(toolCallId, toolName, input);
-            yield ToolCallStart(step,
-                toolCallId: toolCallId, toolName: toolName);
-          case FinishPart(:final reason):
-            acc.finishReason = reason;
-          case UsagePart(:final usage):
-            acc.usage += usage;
-        }
-      }
+      if (reentry) {
+        final assistant = history.last as AssistantMessage;
+        calls = assistant.toolCalls;
+        stepText = assistant.text;
+        stepFinishReason = FinishReason.stop;
+        stepUsage = Usage.zero; // the model was not re-called on resume
+      } else {
+        // 1. Context engineering hook (no-op unless configured).
+        final cfg = prepareStep == null
+            ? null
+            : await prepareStep!(StepContext<TDeps>(
+                step: step,
+                messages: history,
+                deps: deps as TDeps,
+              ));
+        final activeMessages = cfg?.messages ?? history;
+        final activeModel = cfg?.model ?? active.model;
+        final activeTools = _resolveTools(cfg?.activeTools, active.tools);
 
-      totalUsage += acc.usage;
-      history = [...history, acc.assistantMessage()];
-      final calls = acc.toolCalls();
-
-      // 3. No tool calls → terminal step.
-      if (calls.isEmpty) {
-        final result = StepResult(
-          step: step,
-          text: acc.text.toString(),
-          toolCalls: const [],
-          toolResults: const [],
-          finishReason: acc.finishReason,
-          usage: acc.usage,
+        // 2. Call the model, re-emitting deltas and accumulating the turn.
+        final acc = _StepAccumulator();
+        final request = ModelRequest(
+          messages: activeMessages,
+          tools: [
+            for (final t in activeTools) t.spec,
+            for (final h in active.handoffs) _transferSpec(h),
+          ],
+          toolChoice: cfg?.toolChoice ?? ToolChoice.auto,
+          responseFormat: opts.responseFormat ?? ResponseFormat.text,
+          temperature: opts.temperature,
+          maxOutputTokens: opts.maxOutputTokens,
+          cancel: cancel,
         );
-        steps.add(result);
-        yield StepFinish(step, result);
-        stepSpan.end();
-        yield RunFinish(step,
+
+        await for (final part in activeModel.stream(request)) {
+          switch (part) {
+            case TextDeltaPart(:final text):
+              acc.text.write(text);
+              yield TextDelta(step, text);
+            case ReasoningDeltaPart(:final text, :final signature):
+              acc.reasoning.write(text);
+              if (signature != null) acc.reasoningSignature = signature;
+              yield ReasoningDelta(step, text);
+            case ToolCallStartPart(:final toolCallId, :final toolName):
+              acc.openCall(toolCallId, toolName);
+              yield ToolCallStart(step,
+                  toolCallId: toolCallId, toolName: toolName);
+            case ToolCallDeltaPart(:final toolCallId, :final argsDelta):
+              acc.appendArgs(toolCallId, argsDelta);
+              yield ToolCallArgsDelta(step,
+                  toolCallId: toolCallId, argsDelta: argsDelta);
+            case ToolCallCompletePart(
+                :final toolCallId,
+                :final toolName,
+                :final input
+              ):
+              acc.completeCall(toolCallId, toolName, input);
+              yield ToolCallStart(step,
+                  toolCallId: toolCallId, toolName: toolName);
+            case FinishPart(:final reason):
+              acc.finishReason = reason;
+            case UsagePart(:final usage):
+              acc.usage += usage;
+          }
+        }
+
+        totalUsage += acc.usage;
+        history = [...history, acc.assistantMessage()];
+        final stepCalls = acc.toolCalls();
+
+        // 3. No tool calls → terminal step.
+        if (stepCalls.isEmpty) {
+          final result = StepResult(
+            step: step,
+            text: acc.text.toString(),
+            toolCalls: const [],
+            toolResults: const [],
             finishReason: acc.finishReason,
-            usage: totalUsage,
-            text: acc.text.toString());
-        rootSpan.end();
-        return;
+            usage: acc.usage,
+          );
+          steps.add(result);
+          yield StepFinish(step, result);
+          stepSpan.end();
+          yield RunFinish(step,
+              finishReason: acc.finishReason,
+              usage: totalUsage,
+              text: acc.text.toString());
+          rootSpan.end();
+          return;
+        }
+
+        calls = stepCalls;
+        stepText = acc.text.toString();
+        stepFinishReason = acc.finishReason;
+        stepUsage = acc.usage;
       }
 
       // 4. Execute tool calls. Three phases so concurrent execution is possible
@@ -237,13 +327,49 @@ final class ToolLoopAgent<TDeps> implements Agent<TDeps> {
       // unknown tools and approvals sequentially, (b) execute, (c) emit results
       // in call-index order.
 
+      // Handoff targets advertised this step, keyed by their transfer-tool name.
+      final transfers = {
+        for (final h in active.handoffs) 'transfer_to_${h.name}': h,
+      };
+      Handoff<TDeps>? requestedHandoff;
+
+      // Durable-approval resume state for this step (empty on a normal step).
+      final resumedById = reentry
+          ? {for (final r in resume.resolved) r.toolCallId: r}
+          : const <String, ToolResultPart>{};
+      final resumedCallId = reentry ? resume.pendingCall.toolCallId : null;
+      final resumedDecision = reentry ? resume.decision : null;
+
       // 4a. Announce each call; resolve unknown tools and approvals in order
       // (interactive approvals must not race). Approved calls are queued.
       final preResolved = <int, ToolResultPart>{};
       final pending = <int, _PendingTool<TDeps>>{};
+      // On resume, seed results already decided before the suspension so they
+      // are neither re-announced nor re-run.
       for (var i = 0; i < calls.length; i++) {
+        final prior = resumedById[calls[i].toolCallId];
+        if (prior != null) preResolved[i] = prior;
+      }
+      for (var i = 0; i < calls.length; i++) {
+        if (preResolved.containsKey(i)) continue;
         final call = calls[i];
         yield ToolCallReady(step, call);
+
+        // A `transfer_to_<name>` call is structural, not a real tool: ack it so
+        // history stays provider-valid, emit a HandoffEvent, and record the
+        // requested transfer (applied after this step's results are appended).
+        final transferTarget = transfers[call.toolName];
+        if (transferTarget != null) {
+          preResolved[i] = ToolResultPart(
+            toolCallId: call.toolCallId,
+            toolName: call.toolName,
+            output: 'Transferred to ${transferTarget.name}.',
+          );
+          yield HandoffEvent(step, from: active.name, to: transferTarget.name);
+          requestedHandoff = transferTarget;
+          continue;
+        }
+
         final toolCtx = ToolContext<TDeps>(
           deps: deps as TDeps,
           toolCallId: call.toolCallId,
@@ -253,7 +379,7 @@ final class ToolLoopAgent<TDeps> implements Agent<TDeps> {
           tracer: tracer,
         );
 
-        final tool = _toolByName(call.toolName);
+        final tool = _toolByName(call.toolName, active.tools);
         if (tool == null) {
           preResolved[i] = ToolResultPart(
             toolCallId: call.toolCallId,
@@ -265,20 +391,54 @@ final class ToolLoopAgent<TDeps> implements Agent<TDeps> {
         }
 
         if (await tool.needsApprovalFor(call.input, toolCtx)) {
-          yield ApprovalRequest(step, call);
-          final handler = approvalHandler;
-          final decision = handler == null
-              ? const ApprovalDecision.rejected(
-                  'No approval handler configured')
-              : await handler.decide(call, toolCtx);
-          if (decision.rejected) {
-            preResolved[i] = ToolResultPart(
-              toolCallId: call.toolCallId,
-              toolName: call.toolName,
-              output: decision.reason ?? 'Rejected by approval handler',
-              isError: true,
-            );
-            continue;
+          final durable = durableApproval && checkpoints != null;
+          if (durable) {
+            if (resumedCallId == call.toolCallId) {
+              // Resuming exactly this call: apply the human decision.
+              if (resumedDecision!.rejected) {
+                preResolved[i] = ToolResultPart(
+                  toolCallId: call.toolCallId,
+                  toolName: call.toolName,
+                  output:
+                      resumedDecision.reason ?? 'Rejected by approval handler',
+                  isError: true,
+                );
+                continue;
+              }
+              // Approved → fall through to queue the call for execution.
+            } else {
+              // Persist a suspended checkpoint and pause for out-of-band resume.
+              yield ApprovalRequest(step, call);
+              final cpId = checkpointId ?? opts.checkpointId ?? 'run';
+              await checkpoints!.save(AgentCheckpoint(
+                id: cpId,
+                step: step,
+                messages: history,
+                pendingApproval: call,
+                resolvedResults: [
+                  for (var k = 0; k < calls.length; k++)
+                    if (preResolved[k] != null) preResolved[k]!,
+                ],
+                status: CheckpointStatus.suspended,
+              ));
+              throw Suspended(checkpointId: cpId, pendingCall: call);
+            }
+          } else {
+            yield ApprovalRequest(step, call);
+            final handler = approvalHandler;
+            final decision = handler == null
+                ? const ApprovalDecision.rejected(
+                    'No approval handler configured')
+                : await handler.decide(call, toolCtx);
+            if (decision.rejected) {
+              preResolved[i] = ToolResultPart(
+                toolCallId: call.toolCallId,
+                toolName: call.toolName,
+                output: decision.reason ?? 'Rejected by approval handler',
+                isError: true,
+              );
+              continue;
+            }
           }
         }
 
@@ -342,8 +502,24 @@ final class ToolLoopAgent<TDeps> implements Agent<TDeps> {
         yield ToolResult(step, ex.result);
       }
 
-      // 5. Append results, checkpoint (durability seam), record the step.
+      // 5. Append results, apply any handoff, checkpoint, record the step.
       history = [...history, ToolMessage(resultParts)];
+
+      // Apply a requested handoff: swap the active config to the target agent
+      // and rewrite the leading instructions, keeping the accumulated history.
+      if (requestedHandoff != null) {
+        final prevInstructions = active.instructions;
+        final target = requestedHandoff.agent;
+        active
+          ..name = requestedHandoff.name
+          ..model = target.model
+          ..instructions = target.instructions
+          ..tools = target.tools
+          ..handoffs = target.handoffs;
+        history =
+            _applyInstructions(history, prevInstructions, active.instructions);
+      }
+
       await checkpoints?.save(AgentCheckpoint(
         id: checkpointId ?? opts.checkpointId ?? 'run',
         step: step,
@@ -352,11 +528,11 @@ final class ToolLoopAgent<TDeps> implements Agent<TDeps> {
 
       final result = StepResult(
         step: step,
-        text: acc.text.toString(),
+        text: stepText,
         toolCalls: calls,
         toolResults: resultParts,
-        finishReason: acc.finishReason,
-        usage: acc.usage,
+        finishReason: stepFinishReason,
+        usage: stepUsage,
       );
       steps.add(result);
       yield StepFinish(step, result);
@@ -379,9 +555,7 @@ final class ToolLoopAgent<TDeps> implements Agent<TDeps> {
       }
       if (shouldStop) {
         yield RunFinish(step,
-            finishReason: FinishReason.stop,
-            usage: totalUsage,
-            text: acc.text.toString());
+            finishReason: FinishReason.stop, usage: totalUsage, text: stepText);
         rootSpan.end();
         return;
       }
@@ -642,20 +816,53 @@ final class ToolLoopAgent<TDeps> implements Agent<TDeps> {
     return base;
   }
 
-  List<Tool<TDeps>> _resolveTools(List<String>? activeNames) {
-    if (activeNames == null) return tools;
+  /// Restrict [base] to the [activeNames] requested by a `prepareStep` hook.
+  /// Transfer (`transfer_to_*`) tools are structural and never filtered here.
+  List<Tool<TDeps>> _resolveTools(
+    List<String>? activeNames,
+    List<Tool<TDeps>> base,
+  ) {
+    if (activeNames == null) return base;
     final allowed = activeNames.toSet();
     return [
-      for (final t in tools)
+      for (final t in base)
         if (allowed.contains(t.name)) t
     ];
   }
 
-  Tool<TDeps>? _toolByName(String name) {
-    for (final t in tools) {
+  Tool<TDeps>? _toolByName(String name, List<Tool<TDeps>> base) {
+    for (final t in base) {
       if (t.name == name) return t;
     }
     return null;
+  }
+
+  /// The synthetic tool advertised for a handoff target.
+  ToolSpec _transferSpec(Handoff<TDeps> h) => ToolSpec(
+        name: 'transfer_to_${h.name}',
+        description:
+            h.description ?? 'Transfer control to the ${h.name} agent.',
+        inputJsonSchema: const {
+          'type': 'object',
+          'properties': <String, Object?>{},
+        },
+      );
+
+  /// Rewrite the leading [SystemMessage] to a handoff target's [next]
+  /// instructions. Replaces only when the head was the previous agent's injected
+  /// instructions ([prev]); otherwise prepends so a caller-supplied system
+  /// message is never clobbered.
+  List<Message> _applyInstructions(
+    List<Message> history,
+    String? prev,
+    String? next,
+  ) {
+    if (next == null) return history;
+    final head = history.isNotEmpty ? history.first : null;
+    if (prev != null && head is SystemMessage && head.text == prev) {
+      return [SystemMessage(next), ...history.skip(1)];
+    }
+    return [SystemMessage(next), ...history];
   }
 
   static String _extractJson(String text) {
@@ -763,4 +970,36 @@ class _ExecutedTool {
   final ToolResultPart result;
   final Object? error;
   final StackTrace? stackTrace;
+}
+
+/// Carries a durable-approval decision into a resumed step: the call awaiting a
+/// decision, the results already settled before the pause, and the decision.
+class _DurableResume<TDeps> {
+  _DurableResume({
+    required this.pendingCall,
+    required this.resolved,
+    required this.decision,
+  });
+
+  final ToolCallPart pendingCall;
+  final List<ToolResultPart> resolved;
+  final ApprovalDecision decision;
+}
+
+/// The mutable "active agent" config inside the loop. A handoff reassigns these
+/// fields to the target agent's config; the message history is unaffected.
+class _Active<TDeps> {
+  _Active({
+    required this.name,
+    required this.model,
+    required this.instructions,
+    required this.tools,
+    required this.handoffs,
+  });
+
+  String name;
+  LanguageModel model;
+  String? instructions;
+  List<Tool<TDeps>> tools;
+  List<Handoff<TDeps>> handoffs;
 }

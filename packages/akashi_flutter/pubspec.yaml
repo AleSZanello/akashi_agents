@@ -1,15 +1,33 @@
 name: akashi_flutter
 description: >-
-  Flutter integration for the Akashi agent framework: reactive agent
-  controllers, builder widgets, approval-dialog plumbing, and Isolate offload.
-  Roadmap stub for v0.3.
-version: 0.0.1
-publish_to: none
+  Reactive Flutter integration for the Akashi agent framework: an
+  AgentController (ChangeNotifier) that folds an agent's streamed text, events,
+  and approval requests into observable state, plus an AgentBuilder, a
+  message/part renderer, and an Isolate offload helper.
+version: 0.3.0
+repository: https://github.com/Alezanello/akashi_agents/tree/main/packages/akashi_flutter
+issue_tracker: https://github.com/Alezanello/akashi_agents/issues
+topics:
+  - ai
+  - agents
+  - flutter
+  - llm
 
 environment:
-  sdk: ^3.6.0
+  sdk: ^3.9.0
+  flutter: ">=3.10.0"
 
-resolution: workspace
-
+# Standalone resolution (not a workspace member): depends on the Flutter SDK, so
+# it resolves with `flutter pub get` and overrides `akashi` onto local source.
 dependencies:
-  akashi: ^0.2.0
+  akashi: ^0.3.0
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+dependency_overrides:
+  akashi:
+    path: ../akashi

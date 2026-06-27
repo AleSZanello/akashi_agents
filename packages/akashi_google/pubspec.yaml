@@ -18,7 +18,7 @@ environment:
 resolution: workspace
 
 dependencies:
-  akashi: ^0.2.0
+  akashi: ^0.3.0
   googleai_dart: ^8.0.0
   meta: ^1.15.0
 

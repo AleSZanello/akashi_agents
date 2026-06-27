@@ -4,6 +4,10 @@
 build/
 pubspec.lock
 
+# Flutter (generated)
+.flutter-plugins
+.flutter-plugins-dependencies
+
 # Melos
 .melos_tool/
 

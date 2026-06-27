@@ -99,6 +99,20 @@ final class ToolResult extends AgentEvent {
   final ToolResultPart result;
 }
 
+/// Control was transferred from one agent to another via a `transfer_to_<name>`
+/// tool call (see `Handoff`). Subsequent steps use the [to] agent's model,
+/// tools, and instructions; the message history carries across.
+final class HandoffEvent extends AgentEvent {
+  /// Creates a handoff event recording the transfer from [from] to [to].
+  const HandoffEvent(super.step, {required this.from, required this.to});
+
+  /// The name of the agent handing off control.
+  final String from;
+
+  /// The name of the agent taking over.
+  final String to;
+}
+
 /// A step finished (model turn plus any tool execution).
 final class StepFinish extends AgentEvent {
   /// Creates a step-finish event.

@@ -9,6 +9,13 @@ environment:
 
 # Dart pub workspace: one shared lockfile, resolved together.
 # https://dart.dev/tools/pub/workspaces
+#
+# akashi_drift, akashi_flutter, and akashi_gemma are intentionally NOT members:
+# their toolchains pull the workspace off the pure-Dart `dart pub get` path —
+# akashi_drift's `drift_dev` conflicts with melos over `cli_util`, and the two
+# Flutter packages depend on the Flutter SDK. Each resolves standalone (own
+# lockfile, with a path override onto the local `akashi`) and is built/tested
+# under its own tooling (see .github/workflows).
 workspace:
   - packages/akashi
   - packages/akashi_google
@@ -16,12 +23,9 @@ workspace:
   - packages/akashi_openai
   - packages/akashi_anthropic
   - packages/akashi_ollama
-  - packages/akashi_gemma
   - packages/akashi_mcp
   - packages/akashi_gateway
   - packages/akashi_otel
-  - packages/akashi_drift
-  - packages/akashi_flutter
   - examples/cli_quickstart
   - examples/production_agent
 

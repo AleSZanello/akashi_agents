@@ -1,8 +1,10 @@
-/// Akashi on-device provider (Gemma and friends).
+/// On-device models for Akashi agents, backed by flutter_gemma.
 ///
-/// Roadmap stub for v0.3 — implements `LanguageModel` over `flutter_gemma`, so
-/// the same agent code runs against on-device models with no HTTP. The Flutter
-/// dependency is added when this milestone is implemented.
+/// [GemmaModel] implements `LanguageModel` over a [GemmaBackend] — proving the
+/// contract is not HTTP-bound. Use [FlutterGemmaBackend] for real on-device
+/// inference, or a fake backend in tests.
 library;
 
-// TODO(v0.3): implement GemmaProvider over flutter_gemma.
+export 'src/flutter_gemma_backend.dart';
+export 'src/gemma_backend.dart';
+export 'src/gemma_model.dart';

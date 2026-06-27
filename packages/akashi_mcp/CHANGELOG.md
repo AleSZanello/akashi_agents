@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.0
+
+- Upgrade to `dart_mcp` ^0.5.1. `connectStdio` now spawns the server process and
+  bridges its stdio via `stdioChannel` (the client no longer launches it
+  internally); the process is killed on `close()`. Public API unchanged.
+
 ## 0.2.0
 
 Initial release — Model Context Protocol (MCP) tools over the official

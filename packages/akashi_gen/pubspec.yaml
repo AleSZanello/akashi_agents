@@ -18,7 +18,7 @@ environment:
 resolution: workspace
 
 dependencies:
-  akashi: ^0.2.0
+  akashi: ^0.3.0
   analyzer: ^8.0.0
   build: ^4.0.0
   meta: ^1.16.0

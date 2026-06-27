@@ -1,5 +1,31 @@
 # Changelog
 
+## 0.3.0
+
+Multi-agent + durable-execution milestone (additive; one noted sealed-union
+extension).
+
+- **Subagent-as-tool** — `Agent.asTool(...)` (extension) turns any agent into a
+  `Tool` a parent can call, running the child fresh with isolated history and
+  tools.
+- **Handoffs** — `Handoff`/`handoff(...)` expose `transfer_to_<name>` tools; the
+  loop switches the active agent's model/instructions/tools while preserving
+  history, emitting a new `HandoffEvent`. **API note:** `HandoffEvent` is a new
+  subtype of the sealed `AgentEvent` — exhaustive `switch`es without a `default`
+  must add a case.
+- **First-class escalation** — `EscalationPolicy` objects
+  (`escalateOnToolErrors`, `escalateAfterSteps`, `escalateOnLowConfidence`,
+  `escalateWhen`) folded into a `prepareStep` hook via `escalate([...])`.
+- **Message/Part serialization** — `partToJson`/`partFromJson`,
+  `messageToJson`/`messageFromJson`, version-tagged `messagesToJson`, and
+  `checkpointToJson`/`checkpointFromJson`. Total encoding (non-JSON tool output
+  degrades to a flagged string).
+- **Durable human-in-the-loop** — `ToolLoopAgent(durableApproval: true)` with a
+  `CheckpointStore` persists a `suspended` checkpoint and throws `Suspended`
+  instead of blocking; `resume(checkpointId, decision: ...)` re-enters the
+  suspended step. `AgentCheckpoint` gains additive `pendingApproval`,
+  `resolvedResults`, and `status` (`CheckpointStatus`) fields.
+
 ## 0.2.0
 
 Production single-agent milestone (additive — no 0.1.0 API breaks).

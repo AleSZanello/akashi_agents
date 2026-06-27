@@ -17,7 +17,7 @@ environment:
 resolution: workspace
 
 dependencies:
-  akashi: ^0.2.0
+  akashi: ^0.3.0
   opentelemetry: ^0.18.11
 
 dev_dependencies:

@@ -1,9 +1,12 @@
-/// Akashi Flutter integration.
+/// Reactive Flutter integration for the Akashi agent framework.
 ///
-/// Roadmap stub for v0.3 — a reactive `AgentController` (ChangeNotifier /
-/// ValueListenable), an `AgentBuilder` widget, approval-dialog binding, and
-/// Isolate offload via `compute`. The Flutter dependency is added when this
-/// milestone is implemented.
+/// Drive an agent from your widgets with [AgentController] (a `ChangeNotifier`
+/// that is also the agent's `ApprovalHandler`), rebuild on its state with
+/// [AgentBuilder], render a transcript with [MessageListView], and push
+/// CPU-bound work to a background isolate with [offload].
 library;
 
-// TODO(v0.3): implement AgentController and AgentBuilder.
+export 'src/agent_builder.dart';
+export 'src/agent_controller.dart';
+export 'src/isolate.dart';
+export 'src/message_list_view.dart';

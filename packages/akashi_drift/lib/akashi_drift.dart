@@ -1,7 +1,8 @@
-/// Akashi durable checkpoint store (SQLite via drift).
+/// Durable SQLite persistence for Akashi agents.
 ///
-/// Roadmap stub for v0.3 — implements `CheckpointStore` so a run can be
-/// suspended (e.g. awaiting human approval) and resumed across processes.
+/// Provides [DriftCheckpointStore], a `CheckpointStore` backed by drift +
+/// SQLite, for resume and durable human-in-the-loop pauses.
 library;
 
-// TODO(v0.3): implement DriftCheckpointStore.
+export 'src/database.dart' show CheckpointDatabase;
+export 'src/drift_checkpoint_store.dart';
