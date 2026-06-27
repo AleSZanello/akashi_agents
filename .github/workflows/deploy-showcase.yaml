@@ -37,9 +37,15 @@ jobs:
       - run: flutter test
       - run: flutter build web --release
 
+      # Stamp the build so every commit is a unique Hosting version. Firebase
+      # rejects releasing a byte-identical version that is already live
+      # (FAILED_PRECONDITION), so a per-commit marker keeps deploys idempotent.
+      - name: Stamp build version
+        run: |
+          printf '{"commit":"%s","run":"%s"}\n' \
+            "$GITHUB_SHA" "$GITHUB_RUN_ID" > build/web/version.json
+
       # Deploy with the Firebase CLI directly (via the service account as ADC).
-      # The plain `deploy` path handles unchanged content gracefully — unlike the
-      # channel-release API, which rejects re-releasing an identical version.
       - name: Deploy to Firebase Hosting
         env:
           FIREBASE_SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_AKASHI_AGENTS }}
