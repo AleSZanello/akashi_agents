@@ -140,8 +140,11 @@ class AgentController<TDeps> extends ChangeNotifier
     notifyListeners();
     // For an unsupported prompt shape, defer to the agent's own validation.
     await _consume(
-      target.stream(turn != null ? _messages : prompt,
-          deps: deps, options: options),
+      target.stream(
+        turn != null ? _messages : prompt,
+        deps: deps,
+        options: options,
+      ),
     );
   }
 
@@ -164,8 +167,12 @@ class AgentController<TDeps> extends ChangeNotifier
     _isRunning = true;
     notifyListeners();
     await _consume(
-      target.resume(checkpointId,
-          decision: decision, deps: deps, options: options),
+      target.resume(
+        checkpointId,
+        decision: decision,
+        deps: deps,
+        options: options,
+      ),
     );
   }
 
@@ -205,11 +212,11 @@ class AgentController<TDeps> extends ChangeNotifier
   /// Map a [send] prompt onto the user message(s) to append, or null when the
   /// shape is unsupported (left for the agent to validate).
   List<Message>? _userTurn(Object prompt) => switch (prompt) {
-        final String s => [UserMessage.text(s)],
-        final Message m => [m],
-        final Iterable<Message> it => it.toList(),
-        _ => null,
-      };
+    final String s => [UserMessage.text(s)],
+    final Message m => [m],
+    final Iterable<Message> it => it.toList(),
+    _ => null,
+  };
 
   @override
   Future<ApprovalDecision> decide(ToolCallPart call, ToolContext<TDeps> ctx) {

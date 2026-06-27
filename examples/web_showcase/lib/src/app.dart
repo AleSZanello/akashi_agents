@@ -24,10 +24,7 @@ class AkashiShowcaseApp extends StatelessWidget {
           final id = state.pathParameters['id'];
           final demo = id == null ? null : demoById(id);
           if (demo == null) {
-            return GalleryScaffold(
-              selectedId: null,
-              child: _NotFound(id: id),
-            );
+            return GalleryScaffold(selectedId: null, child: _NotFound(id: id));
           }
           return GalleryScaffold(
             selectedId: demo.id,
@@ -62,13 +59,18 @@ class _NotFound extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.travel_explore,
-              size: 48, color: AkashiColors.textFaint),
+          const Icon(
+            Icons.travel_explore,
+            size: 48,
+            color: AkashiColors.textFaint,
+          ),
           const SizedBox(height: 12),
           Text(
             id == null ? 'Page not found' : 'No demo named “$id”',
             style: const TextStyle(
-                fontSize: 18, color: AkashiColors.textSecondary),
+              fontSize: 18,
+              color: AkashiColors.textSecondary,
+            ),
           ),
           const SizedBox(height: 12),
           FilledButton(

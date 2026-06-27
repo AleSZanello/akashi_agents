@@ -34,23 +34,22 @@ class _DemoViewState extends State<DemoView> {
               Text(
                 demo.title,
                 style: const TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w800,
-                    color: AkashiColors.textPrimary),
+                  fontSize: 28,
+                  fontWeight: FontWeight.w800,
+                  color: AkashiColors.textPrimary,
+                ),
               ),
               const SizedBox(height: 10),
               Text(
                 demo.blurb,
                 style: const TextStyle(
-                    fontSize: 14.5,
-                    height: 1.55,
-                    color: AkashiColors.textSecondary),
+                  fontSize: 14.5,
+                  height: 1.55,
+                  color: AkashiColors.textSecondary,
+                ),
               ),
               const SizedBox(height: 20),
-              _Toggle(
-                tab: _tab,
-                onChanged: (t) => setState(() => _tab = t),
-              ),
+              _Toggle(tab: _tab, onChanged: (t) => setState(() => _tab = t)),
               const SizedBox(height: 16),
               Expanded(
                 child: IndexedStack(
@@ -105,8 +104,18 @@ class _Toggle extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _Seg(label: 'Live demo', icon: Icons.play_arrow_rounded, selected: tab == 0, onTap: () => onChanged(0)),
-          _Seg(label: 'Code', icon: Icons.code, selected: tab == 1, onTap: () => onChanged(1)),
+          _Seg(
+            label: 'Live demo',
+            icon: Icons.play_arrow_rounded,
+            selected: tab == 0,
+            onTap: () => onChanged(0),
+          ),
+          _Seg(
+            label: 'Code',
+            icon: Icons.code,
+            selected: tab == 1,
+            onTap: () => onChanged(1),
+          ),
         ],
       ),
     );
@@ -137,9 +146,11 @@ class _Seg extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Row(
             children: [
-              Icon(icon,
-                  size: 16,
-                  color: selected ? Colors.white : AkashiColors.textSecondary),
+              Icon(
+                icon,
+                size: 16,
+                color: selected ? Colors.white : AkashiColors.textSecondary,
+              ),
               const SizedBox(width: 7),
               Text(
                 label,
@@ -173,9 +184,10 @@ class _PillarTag extends StatelessWidget {
       child: Text(
         pillar.label,
         style: const TextStyle(
-            fontSize: 11.5,
-            fontWeight: FontWeight.w700,
-            color: AkashiColors.primary),
+          fontSize: 11.5,
+          fontWeight: FontWeight.w700,
+          color: AkashiColors.primary,
+        ),
       ),
     );
   }

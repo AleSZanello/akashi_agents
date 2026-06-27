@@ -70,13 +70,12 @@ class ScriptedModel implements LanguageModel {
     List<Turn> turns, {
     String modelId = 'scripted',
     Duration chunkDelay = const Duration(milliseconds: 26),
-  }) =>
-      ScriptedModel(
-        modelId: modelId,
-        chunkDelay: chunkDelay,
-        respond: (_, index) =>
-            index < turns.length ? turns[index] : const Turn(text: ''),
-      );
+  }) => ScriptedModel(
+    modelId: modelId,
+    chunkDelay: chunkDelay,
+    respond: (_, index) =>
+        index < turns.length ? turns[index] : const Turn(text: ''),
+  );
 
   final Turn Function(ModelRequest request, int index) _respond;
 

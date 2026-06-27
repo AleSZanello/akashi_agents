@@ -22,9 +22,10 @@ class HomeView extends StatelessWidget {
             const Text(
               'Explore the demos',
               style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  color: AkashiColors.textPrimary),
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: AkashiColors.textPrimary,
+              ),
             ),
             const SizedBox(height: 4),
             const Text(
@@ -42,9 +43,7 @@ class HomeView extends StatelessWidget {
                   mainAxisSpacing: 14,
                   crossAxisSpacing: 14,
                   childAspectRatio: columns == 2 ? 3.0 : 4.2,
-                  children: [
-                    for (final demo in kDemos) _DemoCard(demo: demo),
-                  ],
+                  children: [for (final demo in kDemos) _DemoCard(demo: demo)],
                 );
               },
             ),
@@ -90,9 +89,10 @@ class _Hero extends StatelessWidget {
           const Text(
             'A provider-neutral agent framework for Dart & Flutter.',
             style: TextStyle(
-                fontSize: 18,
-                color: AkashiColors.textPrimary,
-                fontWeight: FontWeight.w500),
+              fontSize: 18,
+              color: AkashiColors.textPrimary,
+              fontWeight: FontWeight.w500,
+            ),
           ),
           const SizedBox(height: 14),
           const Text(
@@ -101,9 +101,10 @@ class _Hero extends StatelessWidget {
             'under-serve. Everything on this site runs live, in your browser, '
             'on a fake model. No API keys, no backend.',
             style: TextStyle(
-                fontSize: 14.5,
-                height: 1.6,
-                color: AkashiColors.textSecondary),
+              fontSize: 14.5,
+              height: 1.6,
+              color: AkashiColors.textSecondary,
+            ),
           ),
           const SizedBox(height: 22),
           Wrap(
@@ -115,8 +116,10 @@ class _Hero extends StatelessWidget {
                 icon: const Icon(Icons.play_arrow_rounded, size: 18),
                 label: const Text('Try the first demo'),
                 style: FilledButton.styleFrom(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 14,
+                  ),
                 ),
               ),
               OutlinedButton.icon(
@@ -126,8 +129,10 @@ class _Hero extends StatelessWidget {
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AkashiColors.textPrimary,
                   side: const BorderSide(color: AkashiColors.border),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 14,
+                  ),
                 ),
               ),
             ],
@@ -173,22 +178,32 @@ class _DemoCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(demo.title,
-                        style: const TextStyle(
-                            fontSize: 15.5,
-                            fontWeight: FontWeight.w700,
-                            color: AkashiColors.textPrimary)),
+                    Text(
+                      demo.title,
+                      style: const TextStyle(
+                        fontSize: 15.5,
+                        fontWeight: FontWeight.w700,
+                        color: AkashiColors.textPrimary,
+                      ),
+                    ),
                     const SizedBox(height: 3),
-                    Text(demo.tagline,
-                        style: const TextStyle(
-                            fontSize: 12.5, color: AkashiColors.textSecondary),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis),
+                    Text(
+                      demo.tagline,
+                      style: const TextStyle(
+                        fontSize: 12.5,
+                        color: AkashiColors.textSecondary,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ],
                 ),
               ),
-              const Icon(Icons.arrow_forward,
-                  size: 16, color: AkashiColors.textFaint),
+              const Icon(
+                Icons.arrow_forward,
+                size: 16,
+                color: AkashiColors.textFaint,
+              ),
             ],
           ),
         ),

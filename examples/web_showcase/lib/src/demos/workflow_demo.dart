@@ -14,7 +14,8 @@ final workflowDemo = Demo(
   tagline: 'Code-driven fan-out + synthesize',
   pillar: Pillar.multiAgent,
   icon: Icons.hub_outlined,
-  blurb: 'The deterministic counterpart to model-driven multi-agent. With '
+  blurb:
+      'The deterministic counterpart to model-driven multi-agent. With '
       '`akashi_workflow` YOU write the topology — here: plan → fan out research '
       'agents (bounded to 2 at a time, with retries) → synthesize. Watch nodes '
       'move queued → running → done, driven by the workflow’s event stream. One '
@@ -97,7 +98,9 @@ class _WorkflowDemoState extends State<_WorkflowDemo> {
           _log.add('✗ ${event.label} — ${event.error}');
         case TaskRetrying():
           node.status = _Status.retrying;
-          _log.add('↻ retrying ${event.label} in ${event.delay.inMilliseconds}ms');
+          _log.add(
+            '↻ retrying ${event.label} in ${event.delay.inMilliseconds}ms',
+          );
       }
     });
   }
@@ -112,7 +115,8 @@ class _WorkflowDemoState extends State<_WorkflowDemo> {
     final researcher = ToolLoopAgent(
       model: ScriptedModel(
         respond: (request, _) => Turn(
-          text: 'finding on “${lastUserText(request)}”: no shared memory; '
+          text:
+              'finding on “${lastUserText(request)}”: no shared memory; '
               'message passing.',
         ),
       ),
@@ -142,21 +146,24 @@ class _WorkflowDemoState extends State<_WorkflowDemo> {
         ),
     ]);
 
-    final gathered =
-        findings.where((r) => r.ok).map((r) => r.value!).toList();
+    final gathered = findings.where((r) => r.ok).map((r) => r.value!).toList();
 
     final writer = ToolLoopAgent(
       model: ScriptedModel(
         respond: (request, _) => Turn(
-          text: 'Synthesis of ${gathered.length} findings: Dart concurrency is '
+          text:
+              'Synthesis of ${gathered.length} findings: Dart concurrency is '
               'built on isolates (no shared memory) coordinated by the event '
               'loop, with async/await and streams as the ergonomic surface.',
         ),
       ),
     );
     final report = await wf.run(
-      agentTask(writer, 'Synthesize:\n${gathered.join('\n')}',
-          label: 'synthesize'),
+      agentTask(
+        writer,
+        'Synthesize:\n${gathered.join('\n')}',
+        label: 'synthesize',
+      ),
     );
 
     if (!mounted) return;
@@ -175,14 +182,18 @@ class _WorkflowDemoState extends State<_WorkflowDemo> {
           children: [
             FilledButton.icon(
               onPressed: _running ? null : _run,
-              icon: Icon(_done ? Icons.replay : Icons.play_arrow_rounded,
-                  size: 18),
+              icon: Icon(
+                _done ? Icons.replay : Icons.play_arrow_rounded,
+                size: 18,
+              ),
               label: Text(_done ? 'Run again' : 'Run workflow'),
             ),
             const SizedBox(width: 12),
             if (_running)
-              const Text('orchestrating…',
-                  style: TextStyle(color: AkashiColors.textSecondary)),
+              const Text(
+                'orchestrating…',
+                style: TextStyle(color: AkashiColors.textSecondary),
+              ),
           ],
         ),
         const SizedBox(height: 18),
@@ -210,9 +221,14 @@ class _WorkflowDemoState extends State<_WorkflowDemo> {
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: AkashiColors.border),
             ),
-            child: Text(_report,
-                style: const TextStyle(
-                    color: AkashiColors.textPrimary, height: 1.5, fontSize: 14)),
+            child: Text(
+              _report,
+              style: const TextStyle(
+                color: AkashiColors.textPrimary,
+                height: 1.5,
+                fontSize: 14,
+              ),
+            ),
           ),
         ],
         const SizedBox(height: 18),
@@ -235,19 +251,25 @@ class _StageLabel extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.baseline,
       textBaseline: TextBaseline.alphabetic,
       children: [
-        Text(title,
-            style: const TextStyle(
-                fontWeight: FontWeight.w700,
-                color: AkashiColors.textPrimary,
-                fontSize: 14.5)),
+        Text(
+          title,
+          style: const TextStyle(
+            fontWeight: FontWeight.w700,
+            color: AkashiColors.textPrimary,
+            fontSize: 14.5,
+          ),
+        ),
         const SizedBox(width: 10),
         Expanded(
-          child: Text(subtitle,
-              style: const TextStyle(
-                  fontFamily: 'monospace',
-                  fontFamilyFallback: kMonoFontFamilyFallback,
-                  color: AkashiColors.textFaint,
-                  fontSize: 11.5)),
+          child: Text(
+            subtitle,
+            style: const TextStyle(
+              fontFamily: 'monospace',
+              fontFamilyFallback: kMonoFontFamilyFallback,
+              color: AkashiColors.textFaint,
+              fontSize: 11.5,
+            ),
+          ),
         ),
       ],
     );
@@ -291,11 +313,14 @@ class _NodeCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(node.title,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.w600,
-                        color: AkashiColors.textPrimary,
-                        fontSize: 13.5)),
+                Text(
+                  node.title,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: AkashiColors.textPrimary,
+                    fontSize: 13.5,
+                  ),
+                ),
                 Text(
                   node.status.name +
                       (node.attempt > 1 ? ' · attempt ${node.attempt}' : ''),
@@ -327,8 +352,10 @@ class _EventLog extends StatelessWidget {
       ),
       child: lines.isEmpty
           ? const Center(
-              child: Text('Run the workflow to see live events.',
-                  style: TextStyle(color: AkashiColors.textFaint, fontSize: 12)),
+              child: Text(
+                'Run the workflow to see live events.',
+                style: TextStyle(color: AkashiColors.textFaint, fontSize: 12),
+              ),
             )
           : ListView(
               reverse: true,
@@ -336,12 +363,15 @@ class _EventLog extends StatelessWidget {
                 for (final line in lines.reversed)
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 1),
-                    child: Text(line,
-                        style: const TextStyle(
-                            fontFamily: 'monospace',
-                            fontFamilyFallback: kMonoFontFamilyFallback,
-                            fontSize: 12,
-                            color: AkashiColors.textSecondary)),
+                    child: Text(
+                      line,
+                      style: const TextStyle(
+                        fontFamily: 'monospace',
+                        fontFamilyFallback: kMonoFontFamilyFallback,
+                        fontSize: 12,
+                        color: AkashiColors.textSecondary,
+                      ),
+                    ),
                   ),
               ],
             ),

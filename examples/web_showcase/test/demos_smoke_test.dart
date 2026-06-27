@@ -15,9 +15,9 @@ Future<void> advance(WidgetTester tester, [int ms = 5000]) async {
 }
 
 Widget host(Widget child) => MaterialApp(
-      theme: buildAkashiTheme(),
-      home: Scaffold(body: SizedBox(width: 900, height: 640, child: child)),
-    );
+  theme: buildAkashiTheme(),
+  home: Scaffold(body: SizedBox(width: 900, height: 640, child: child)),
+);
 
 void main() {
   testWidgets('streaming chat renders a streamed reply', (tester) async {
@@ -41,8 +41,9 @@ void main() {
     expect(find.textContaining('partly cloudy'), findsWidgets);
   });
 
-  testWidgets('durable: suspend, restart, resume to completion',
-      (tester) async {
+  testWidgets('durable: suspend, restart, resume to completion', (
+    tester,
+  ) async {
     await tester.pumpWidget(host(Builder(builder: durableDemo.builder)));
 
     // 1. Start the job → it suspends on the approval gate.
@@ -62,8 +63,9 @@ void main() {
     expect(find.textContaining('Refund complete'), findsOneWidget);
   });
 
-  testWidgets('workflow: fan-out + retry + synthesize completes',
-      (tester) async {
+  testWidgets('workflow: fan-out + retry + synthesize completes', (
+    tester,
+  ) async {
     await tester.pumpWidget(host(Builder(builder: workflowDemo.builder)));
 
     await tester.tap(find.text('Run workflow'));

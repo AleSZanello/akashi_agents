@@ -12,7 +12,11 @@ const kPubUrl = 'https://pub.dev/packages/akashi';
 /// The persistent shell: an Akashi-branded sidebar of demos beside [child].
 /// Collapses the sidebar into a drawer below 900px.
 class GalleryScaffold extends StatelessWidget {
-  const GalleryScaffold({super.key, required this.selectedId, required this.child});
+  const GalleryScaffold({
+    super.key,
+    required this.selectedId,
+    required this.child,
+  });
 
   /// The currently-open demo id, or null on the home page.
   final String? selectedId;
@@ -40,10 +44,7 @@ class GalleryScaffold extends StatelessWidget {
         backgroundColor: AkashiColors.background,
         title: const _Wordmark(compact: true),
       ),
-      drawer: Drawer(
-        backgroundColor: AkashiColors.background,
-        child: sidebar,
-      ),
+      drawer: Drawer(backgroundColor: AkashiColors.background, child: sidebar),
       body: child,
     );
   }
@@ -78,7 +79,10 @@ class _Sidebar extends StatelessWidget {
               child: Text(
                 'Live, in-browser demos — every one runs on a fake model. No API keys.',
                 style: TextStyle(
-                    color: AkashiColors.textFaint, fontSize: 12, height: 1.4),
+                  color: AkashiColors.textFaint,
+                  fontSize: 12,
+                  height: 1.4,
+                ),
               ),
             ),
             const Divider(height: 1, color: AkashiColors.border),
@@ -139,11 +143,13 @@ class _SidebarItem extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
             child: Row(
               children: [
-                Icon(demo.icon,
-                    size: 18,
-                    color: selected
-                        ? AkashiColors.primary
-                        : AkashiColors.textSecondary),
+                Icon(
+                  demo.icon,
+                  size: 18,
+                  color: selected
+                      ? AkashiColors.primary
+                      : AkashiColors.textSecondary,
+                ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
@@ -153,8 +159,9 @@ class _SidebarItem extends StatelessWidget {
                         demo.title,
                         style: TextStyle(
                           fontSize: 13.5,
-                          fontWeight:
-                              selected ? FontWeight.w700 : FontWeight.w500,
+                          fontWeight: selected
+                              ? FontWeight.w700
+                              : FontWeight.w500,
                           color: selected
                               ? AkashiColors.textPrimary
                               : AkashiColors.textPrimary,
@@ -163,7 +170,9 @@ class _SidebarItem extends StatelessWidget {
                       Text(
                         demo.tagline,
                         style: const TextStyle(
-                            fontSize: 11.5, color: AkashiColors.textFaint),
+                          fontSize: 11.5,
+                          color: AkashiColors.textFaint,
+                        ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -189,10 +198,16 @@ class _SidebarLinks extends StatelessWidget {
       child: Row(
         children: [
           _LinkButton(
-              icon: Icons.code_rounded, label: 'GitHub', url: kGithubUrl),
+            icon: Icons.code_rounded,
+            label: 'GitHub',
+            url: kGithubUrl,
+          ),
           const SizedBox(width: 8),
           _LinkButton(
-              icon: Icons.inventory_2_outlined, label: 'pub.dev', url: kPubUrl),
+            icon: Icons.inventory_2_outlined,
+            label: 'pub.dev',
+            url: kPubUrl,
+          ),
         ],
       ),
     );
@@ -200,8 +215,11 @@ class _SidebarLinks extends StatelessWidget {
 }
 
 class _LinkButton extends StatelessWidget {
-  const _LinkButton(
-      {required this.icon, required this.label, required this.url});
+  const _LinkButton({
+    required this.icon,
+    required this.label,
+    required this.url,
+  });
   final IconData icon;
   final String label;
   final String url;
@@ -249,16 +267,20 @@ class _Wordmark extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('Akashi',
-                style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w800,
-                    color: AkashiColors.textPrimary,
-                    height: 1.0)),
+            const Text(
+              'Akashi',
+              style: TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.w800,
+                color: AkashiColors.textPrimary,
+                height: 1.0,
+              ),
+            ),
             if (!compact)
-              const Text('agents for Dart & Flutter',
-                  style:
-                      TextStyle(fontSize: 11, color: AkashiColors.textFaint)),
+              const Text(
+                'agents for Dart & Flutter',
+                style: TextStyle(fontSize: 11, color: AkashiColors.textFaint),
+              ),
           ],
         ),
       ],

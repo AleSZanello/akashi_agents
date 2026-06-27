@@ -13,7 +13,8 @@ final escalationDemo = Demo(
   tagline: 'Start cheap, escalate when it’s hard',
   pillar: Pillar.multiAgent,
   icon: Icons.trending_up,
-  blurb: 'The cost/quality lever. Run on a cheap model and let an '
+  blurb:
+      'The cost/quality lever. Run on a cheap model and let an '
       '`EscalationPolicy` swap in a stronger one when the task proves hard. Here '
       '`escalateOnToolErrors(afterErrors: 1)` upgrades the model the moment a '
       'tool call fails — the next step runs on the stronger model.',
@@ -58,7 +59,8 @@ class _EscalationDemoState extends State<_EscalationDemo> {
     final strong = ScriptedModel(
       modelId: 'pro-strong',
       respond: (request, _) => const Turn(
-        text: 'Now on the stronger model — I’ll answer directly without the '
+        text:
+            'Now on the stronger model — I’ll answer directly without the '
             'knowledge base: isolates give you parallelism without shared '
             'mutable state, communicating only via messages.',
       ),
@@ -102,9 +104,10 @@ class _EscalationDemoState extends State<_EscalationDemo> {
                   'Starts on flash-cheap. The knowledge_base tool fails once → '
                   'the policy escalates → the next step runs on pro-strong.',
                   style: TextStyle(
-                      fontSize: 12.5,
-                      color: AkashiColors.textSecondary,
-                      height: 1.4),
+                    fontSize: 12.5,
+                    color: AkashiColors.textSecondary,
+                    height: 1.4,
+                  ),
                 ),
               ),
             ],

@@ -69,7 +69,8 @@ class _ChatPanelState extends State<ChatPanel> {
     return AgentBuilder(
       controller: c,
       builder: (context, controller) {
-        final busy = controller.isRunning ||
+        final busy =
+            controller.isRunning ||
             controller.pendingApproval != null ||
             controller.suspended != null;
         return Column(
@@ -118,8 +119,9 @@ class _Transcript extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final messages =
-        controller.messages.where((m) => m is! SystemMessage).toList();
+    final messages = controller.messages
+        .where((m) => m is! SystemMessage)
+        .toList();
     final showLive = _showLiveBubble(controller);
     final showTyping = controller.isRunning && !showLive;
 
@@ -156,10 +158,8 @@ class _Transcript extends StatelessWidget {
     return true;
   }
 
-  Widget _liveBubble(String text) => _Bubble(
-        role: _Role.assistant,
-        child: _StreamingText(text),
-      );
+  Widget _liveBubble(String text) =>
+      _Bubble(role: _Role.assistant, child: _StreamingText(text));
 }
 
 enum _Role { user, assistant }
@@ -172,35 +172,35 @@ class _MessageView extends StatelessWidget {
   Widget build(BuildContext context) {
     return switch (message) {
       UserMessage() => _Bubble(
-          role: _Role.user,
-          child: Text(_text(message), style: _bubbleTextStyle),
-        ),
+        role: _Role.user,
+        child: Text(_text(message), style: _bubbleTextStyle),
+      ),
       AssistantMessage(:final content) => _Bubble(
-          role: _Role.assistant,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              for (final part in content)
-                if (part is ReasoningPart)
-                  _ReasoningTile(part.text)
-                else if (part is TextPart && part.text.isNotEmpty)
-                  Text(part.text, style: _bubbleTextStyle)
-                else if (part is ToolCallPart)
-                  _ToolCallChip(part),
-            ],
-          ),
+        role: _Role.assistant,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            for (final part in content)
+              if (part is ReasoningPart)
+                _ReasoningTile(part.text)
+              else if (part is TextPart && part.text.isNotEmpty)
+                Text(part.text, style: _bubbleTextStyle)
+              else if (part is ToolCallPart)
+                _ToolCallChip(part),
+          ],
         ),
+      ),
       ToolMessage(:final content) => _Bubble(
-          role: _Role.assistant,
-          tinted: true,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              for (final part in content)
-                if (part is ToolResultPart) _ToolResultRow(part),
-            ],
-          ),
+        role: _Role.assistant,
+        tinted: true,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            for (final part in content)
+              if (part is ToolResultPart) _ToolResultRow(part),
+          ],
         ),
+      ),
       SystemMessage() => const SizedBox.shrink(),
     };
   }
@@ -268,8 +268,11 @@ class _ToolCallChip extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.build_circle_outlined,
-              size: 15, color: AkashiColors.primary),
+          const Icon(
+            Icons.build_circle_outlined,
+            size: 15,
+            color: AkashiColors.primary,
+          ),
           const SizedBox(width: 7),
           Flexible(
             child: Text(
@@ -297,15 +300,19 @@ class _ToolResultRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color =
-        result.isError ? Theme.of(context).colorScheme.error : AkashiColors.accent;
+    final color = result.isError
+        ? Theme.of(context).colorScheme.error
+        : AkashiColors.accent;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(result.isError ? Icons.error_outline : Icons.south_west,
-              size: 14, color: color),
+          Icon(
+            result.isError ? Icons.error_outline : Icons.south_west,
+            size: 14,
+            color: color,
+          ),
           const SizedBox(width: 7),
           Flexible(
             child: Text(
@@ -336,18 +343,26 @@ class _ReasoningTile extends StatelessWidget {
         dense: true,
         tilePadding: EdgeInsets.zero,
         childrenPadding: const EdgeInsets.only(bottom: 8),
-        leading: const Icon(Icons.psychology_outlined,
-            size: 16, color: AkashiColors.textSecondary),
-        title: const Text('Reasoning',
-            style: TextStyle(fontSize: 12.5, color: AkashiColors.textSecondary)),
+        leading: const Icon(
+          Icons.psychology_outlined,
+          size: 16,
+          color: AkashiColors.textSecondary,
+        ),
+        title: const Text(
+          'Reasoning',
+          style: TextStyle(fontSize: 12.5, color: AkashiColors.textSecondary),
+        ),
         children: [
           Align(
             alignment: Alignment.centerLeft,
-            child: Text(text,
-                style: const TextStyle(
-                    fontSize: 12.5,
-                    color: AkashiColors.textSecondary,
-                    height: 1.5)),
+            child: Text(
+              text,
+              style: const TextStyle(
+                fontSize: 12.5,
+                color: AkashiColors.textSecondary,
+                height: 1.5,
+              ),
+            ),
           ),
         ],
       ),
@@ -383,11 +398,7 @@ class _TypingBubble extends StatelessWidget {
   Widget build(BuildContext context) {
     return const _Bubble(
       role: _Role.assistant,
-      child: SizedBox(
-        height: 16,
-        width: 36,
-        child: _Dots(),
-      ),
+      child: SizedBox(height: 16, width: 36, child: _Dots()),
     );
   }
 }
@@ -425,7 +436,9 @@ class _DotsState extends State<_Dots> with SingleTickerProviderStateMixin {
               child: Opacity(
                 opacity: opacity.clamp(0.3, 1.0),
                 child: const CircleAvatar(
-                    radius: 3, backgroundColor: AkashiColors.textSecondary),
+                  radius: 3,
+                  backgroundColor: AkashiColors.textSecondary,
+                ),
               ),
             );
           }),
@@ -458,13 +471,18 @@ class _ApprovalCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.shield_outlined,
-                  size: 18, color: Color(0xFFE0B252)),
+              const Icon(
+                Icons.shield_outlined,
+                size: 18,
+                color: Color(0xFFE0B252),
+              ),
               const SizedBox(width: 8),
               Text(
                 durable ? 'Durable approval required' : 'Approval required',
                 style: const TextStyle(
-                    fontWeight: FontWeight.w700, color: Color(0xFFE0B252)),
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFFE0B252),
+                ),
               ),
             ],
           ),
@@ -473,7 +491,10 @@ class _ApprovalCard extends StatelessWidget {
             'The agent wants to call “${call.toolName}” with '
             '${call.input}. ${durable ? 'The run was persisted and suspended.' : ''}',
             style: const TextStyle(
-                color: AkashiColors.textSecondary, fontSize: 13, height: 1.4),
+              color: AkashiColors.textSecondary,
+              fontSize: 13,
+              height: 1.4,
+            ),
           ),
           const SizedBox(height: 12),
           Row(
@@ -510,10 +531,13 @@ class _ErrorBanner extends StatelessWidget {
         color: Theme.of(context).colorScheme.error.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
-            color: Theme.of(context).colorScheme.error.withValues(alpha: 0.5)),
+          color: Theme.of(context).colorScheme.error.withValues(alpha: 0.5),
+        ),
       ),
-      child: Text('$error',
-          style: TextStyle(color: Theme.of(context).colorScheme.error)),
+      child: Text(
+        '$error',
+        style: TextStyle(color: Theme.of(context).colorScheme.error),
+      ),
     );
   }
 }
@@ -574,8 +598,10 @@ class _InputRow extends StatelessWidget {
               hintText: placeholder,
               filled: true,
               fillColor: AkashiColors.surfaceHigh,
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 14,
+                vertical: 12,
+              ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: const BorderSide(color: AkashiColors.border),

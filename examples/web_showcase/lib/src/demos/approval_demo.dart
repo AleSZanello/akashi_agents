@@ -12,7 +12,8 @@ final approvalDemo = Demo(
   tagline: 'Approve or deny risky tool calls',
   pillar: Pillar.foundations,
   icon: Icons.verified_user_outlined,
-  blurb: 'A tool can opt into approval via `needsApproval`. `AgentController` '
+  blurb:
+      'A tool can opt into approval via `needsApproval`. `AgentController` '
       'is itself the agent’s `ApprovalHandler`: the loop pauses, the UI surfaces '
       'the pending call, and your Approve/Deny choice resumes it. Denials are '
       'fed back to the model as an error result.',
@@ -22,17 +23,17 @@ final approvalDemo = Demo(
 
 /// A sensitive tool that pauses for human approval before running.
 Tool<Object?> _sendEmailTool() => tool<({String to, String subject}), Object?>(
-      name: 'send_email',
-      description: 'Send an email on the user’s behalf.',
-      inputSchema: Schema.object(
-        {'to': Schema.string(), 'subject': Schema.string()},
-        required: ['to', 'subject'],
-        fromJson: (json) =>
-            (to: json['to']! as String, subject: json['subject']! as String),
-      ),
-      execute: (input, ctx) async => 'sent to ${input.to}',
-      needsApproval: (input, ctx) => true,
-    );
+  name: 'send_email',
+  description: 'Send an email on the user’s behalf.',
+  inputSchema: Schema.object(
+    {'to': Schema.string(), 'subject': Schema.string()},
+    required: ['to', 'subject'],
+    fromJson: (json) =>
+        (to: json['to']! as String, subject: json['subject']! as String),
+  ),
+  execute: (input, ctx) async => 'sent to ${input.to}',
+  needsApproval: (input, ctx) => true,
+);
 
 class _ApprovalDemo extends StatefulWidget {
   const _ApprovalDemo();
@@ -58,7 +59,8 @@ class _ApprovalDemoState extends State<_ApprovalDemo> {
           );
         }
         return Turn(
-          reasoning: 'This will contact someone on the user’s behalf, so I '
+          reasoning:
+              'This will contact someone on the user’s behalf, so I '
               'should request approval before sending.',
           toolCalls: [
             ToolCallSpec('send_email', {

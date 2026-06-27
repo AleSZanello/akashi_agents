@@ -12,7 +12,8 @@ final handoffDemo = Demo(
   tagline: 'Transfer control between agents',
   pillar: Pillar.multiAgent,
   icon: Icons.swap_horiz,
-  blurb: 'A handoff is a control *transfer*, not a subroutine. A triage agent '
+  blurb:
+      'A handoff is a control *transfer*, not a subroutine. A triage agent '
       'exposes `transfer_to_<name>` tools; when it calls one, the loop swaps the '
       'active agent (model + instructions + tools) for the rest of the '
       'conversation while the message history carries across.',
@@ -48,7 +49,8 @@ class _HandoffDemoState extends State<_HandoffDemo> {
     final billing = ToolLoopAgent<Object?>(
       model: ScriptedModel(
         respond: (request, _) => const Turn(
-          text: 'Billing here 💳 — I can see your account. I’ve queued the '
+          text:
+              'Billing here 💳 — I can see your account. I’ve queued the '
               'refund and you’ll see it in 3–5 business days. Anything else?',
         ),
       ),
@@ -59,7 +61,8 @@ class _HandoffDemoState extends State<_HandoffDemo> {
     final tech = ToolLoopAgent<Object?>(
       model: ScriptedModel(
         respond: (request, _) => const Turn(
-          text: 'Tech support here 🛠 — let’s fix that. Try signing out and '
+          text:
+              'Tech support here 🛠 — let’s fix that. Try signing out and '
               'back in; if the error persists, clear the app cache and retry.',
         ),
       ),
@@ -70,7 +73,8 @@ class _HandoffDemoState extends State<_HandoffDemo> {
       model: ScriptedModel(
         respond: (request, _) {
           final q = lastUserText(request).toLowerCase();
-          final billingIntent = q.contains('refund') ||
+          final billingIntent =
+              q.contains('refund') ||
               q.contains('charge') ||
               q.contains('bill') ||
               q.contains('pay');
@@ -106,7 +110,8 @@ class _HandoffDemoState extends State<_HandoffDemo> {
     return ChatPanel(
       controller: controller,
       placeholder: 'Describe your issue…',
-      emptyHint: 'Ask about a refund or a bug — triage routes you to a specialist.',
+      emptyHint:
+          'Ask about a refund or a bug — triage routes you to a specialist.',
       suggestions: const [
         'I want a refund for order 4242',
         'The app keeps crashing on launch',

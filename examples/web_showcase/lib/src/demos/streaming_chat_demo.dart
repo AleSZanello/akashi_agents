@@ -12,7 +12,8 @@ final streamingChatDemo = Demo(
   tagline: 'Token streaming → reactive UI',
   pillar: Pillar.foundations,
   icon: Icons.chat_bubble_outline,
-  blurb: 'A `ToolLoopAgent` streams every token over a `Stream<AgentEvent>`. '
+  blurb:
+      'A `ToolLoopAgent` streams every token over a `Stream<AgentEvent>`. '
       '`AgentController` folds those deltas into observable state, and '
       '`AgentBuilder` rebuilds the UI — so the reply types out live with no '
       'manual setState plumbing.',
@@ -37,7 +38,8 @@ class _StreamingChatDemoState extends State<_StreamingChatDemo> {
       respond: (request, _) {
         final q = lastUserText(request);
         return Turn(
-          text: 'You said: “$q”.\n\n'
+          text:
+              'You said: “$q”.\n\n'
               'Every token you see is arriving as a TextDelta event over a '
               'Stream<AgentEvent>. AgentController accumulates them and notifies '
               'its listeners, so this bubble repaints as the words land — that '

@@ -38,9 +38,7 @@ class _CodeViewState extends State<CodeView> {
           Container(
             padding: const EdgeInsets.fromLTRB(14, 8, 8, 8),
             decoration: const BoxDecoration(
-              border: Border(
-                bottom: BorderSide(color: AkashiColors.border),
-              ),
+              border: Border(bottom: BorderSide(color: AkashiColors.border)),
             ),
             child: Row(
               children: [
@@ -99,9 +97,31 @@ class _CodeViewState extends State<CodeView> {
 // A deliberately small, dependency-free Dart tinter: keywords, strings, comments,
 // and types. Not a full lexer — just enough to make the snippets readable.
 const _keywords = {
-  'final', 'const', 'var', 'void', 'return', 'await', 'async', 'for', 'if',
-  'else', 'class', 'extends', 'implements', 'true', 'false', 'null', 'new',
-  'required', 'import', 'yield', 'in', 'switch', 'case', 'this', 'late',
+  'final',
+  'const',
+  'var',
+  'void',
+  'return',
+  'await',
+  'async',
+  'for',
+  'if',
+  'else',
+  'class',
+  'extends',
+  'implements',
+  'true',
+  'false',
+  'null',
+  'new',
+  'required',
+  'import',
+  'yield',
+  'in',
+  'switch',
+  'case',
+  'this',
+  'late',
 };
 
 // Built from a normal (escaped) string: raw strings can't hold both quote
@@ -123,7 +143,9 @@ TextSpan _highlight(String code) {
     final type = m.group(3);
     final word = m.group(4);
     if (comment != null) {
-      spans.add(TextSpan(text: comment, style: _style(const Color(0xFF5C6478))));
+      spans.add(
+        TextSpan(text: comment, style: _style(const Color(0xFF5C6478))),
+      );
     } else if (string != null) {
       spans.add(TextSpan(text: string, style: _style(const Color(0xFF6FD08C))));
     } else if (type != null) {

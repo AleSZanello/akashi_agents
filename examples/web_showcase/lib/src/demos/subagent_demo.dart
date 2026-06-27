@@ -12,7 +12,8 @@ final subagentDemo = Demo(
   tagline: 'Delegate to an isolated child agent',
   pillar: Pillar.multiAgent,
   icon: Icons.account_tree_outlined,
-  blurb: 'The core multi-agent primitive. `Agent.asTool` turns a whole agent '
+  blurb:
+      'The core multi-agent primitive. `Agent.asTool` turns a whole agent '
       'into a tool. The child runs with its OWN fresh context and its own tools '
       '(none of which leak to the parent) and returns just its final text. Here '
       'an orchestrator delegates to a research subagent that runs its own search.',
@@ -53,13 +54,16 @@ class _SubagentDemoState extends State<_SubagentDemo> {
           final result = lastToolResult(request);
           if (result != null) {
             return Turn(
-              text: 'Findings: ${result.output} '
+              text:
+                  'Findings: ${result.output} '
                   'This makes them safe for true parallelism.',
             );
           }
-          return Turn(toolCalls: [
-            ToolCallSpec('web_search', {'query': lastUserText(request)}),
-          ]);
+          return Turn(
+            toolCalls: [
+              ToolCallSpec('web_search', {'query': lastUserText(request)}),
+            ],
+          );
         },
       ),
       tools: [search],
@@ -85,12 +89,11 @@ class _SubagentDemoState extends State<_SubagentDemo> {
         respond: (request, _) {
           final result = lastToolResult(request);
           if (result != null) {
-            return Turn(
-              text: 'My researcher looked into it. ${result.output}',
-            );
+            return Turn(text: 'My researcher looked into it. ${result.output}');
           }
           return Turn(
-            reasoning: 'I’ll delegate the investigation to my research subagent '
+            reasoning:
+                'I’ll delegate the investigation to my research subagent '
                 'so it works in its own isolated context.',
             toolCalls: [
               ToolCallSpec('research', {'question': lastUserText(request)}),

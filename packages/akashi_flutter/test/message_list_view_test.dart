@@ -27,7 +27,9 @@ void main() {
 
   testWidgets('renders every Part subtype', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(home: Scaffold(body: MessageListView(messages: messages))),
+      MaterialApp(
+        home: Scaffold(body: MessageListView(messages: messages)),
+      ),
     );
 
     expect(find.text('hello'), findsOneWidget);

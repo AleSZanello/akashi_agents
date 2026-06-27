@@ -12,7 +12,8 @@ final durableDemo = Demo(
   tagline: 'Pause across a process restart',
   pillar: Pillar.durableFlutter,
   icon: Icons.bedtime_outlined,
-  blurb: 'The durability pillar. With `durableApproval` and a `CheckpointStore`, '
+  blurb:
+      'The durability pillar. With `durableApproval` and a `CheckpointStore`, '
       'an approval doesn’t block in memory — the run persists a checkpoint and '
       'throws `Suspended`, holding ZERO compute. A brand-new agent in a fresh '
       '“process” can `resume(checkpointId, decision:)` from the store and finish. '
@@ -47,11 +48,12 @@ class _DurableDemoState extends State<_DurableDemo> {
             text: result.isError
                 ? 'No refund was issued — the request was denied.'
                 : 'Refund complete: ${result.output}. The customer has been '
-                    'emailed a confirmation. ✅',
+                      'emailed a confirmation. ✅',
           );
         }
         return Turn(
-          reasoning: 'Issuing money needs a human sign-off — I’ll request '
+          reasoning:
+              'Issuing money needs a human sign-off — I’ll request '
               'durable approval so the run can pause safely.',
           toolCalls: [
             ToolCallSpec('issue_refund', {'orderId': '4242'}),
@@ -71,16 +73,16 @@ class _DurableDemoState extends State<_DurableDemo> {
   }
 
   Tool<Object?> _refundTool() => tool<({String orderId}), Object?>(
-        name: 'issue_refund',
-        description: 'Issue a \$120 refund for an order.',
-        inputSchema: Schema.object(
-          {'orderId': Schema.string()},
-          required: ['orderId'],
-          fromJson: (json) => (orderId: json['orderId']! as String),
-        ),
-        execute: (input, ctx) async => '\$120 on order #${input.orderId}',
-        needsApproval: (input, ctx) => true,
-      );
+    name: 'issue_refund',
+    description: 'Issue a \$120 refund for an order.',
+    inputSchema: Schema.object(
+      {'orderId': Schema.string()},
+      required: ['orderId'],
+      fromJson: (json) => (orderId: json['orderId']! as String),
+    ),
+    execute: (input, ctx) async => '\$120 on order #${input.orderId}',
+    needsApproval: (input, ctx) => true,
+  );
 
   Future<void> _start() async {
     setState(() => _busy = true);
@@ -177,26 +179,37 @@ class _StoreCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.storage_rounded,
-                  size: 17, color: AkashiColors.textSecondary),
+              const Icon(
+                Icons.storage_rounded,
+                size: 17,
+                color: AkashiColors.textSecondary,
+              ),
               const SizedBox(width: 8),
-              const Text('CheckpointStore',
-                  style: TextStyle(
-                      fontWeight: FontWeight.w700,
-                      color: AkashiColors.textPrimary)),
+              const Text(
+                'CheckpointStore',
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  color: AkashiColors.textPrimary,
+                ),
+              ),
               const SizedBox(width: 8),
-              const Text('InMemoryCheckpointStore',
-                  style: TextStyle(
-                      fontFamily: 'monospace',
-                      fontFamilyFallback: kMonoFontFamilyFallback,
-                      fontSize: 11.5,
-                      color: AkashiColors.textFaint)),
+              const Text(
+                'InMemoryCheckpointStore',
+                style: TextStyle(
+                  fontFamily: 'monospace',
+                  fontFamilyFallback: kMonoFontFamilyFallback,
+                  fontSize: 11.5,
+                  color: AkashiColors.textFaint,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 12),
           if (cp == null)
-            const Text('— empty —',
-                style: TextStyle(color: AkashiColors.textFaint, fontSize: 13))
+            const Text(
+              '— empty —',
+              style: TextStyle(color: AkashiColors.textFaint, fontSize: 13),
+            )
           else
             Row(
               children: [
@@ -216,18 +229,24 @@ class _StoreCard extends StatelessWidget {
   }
 
   Widget _kv(String k, String v) => RichText(
-        text: TextSpan(
-          style: const TextStyle(
-            fontFamily: 'monospace',
-            fontFamilyFallback: kMonoFontFamilyFallback,
-            fontSize: 12.5,
-          ),
-          children: [
-            TextSpan(text: '$k: ', style: const TextStyle(color: AkashiColors.textFaint)),
-            TextSpan(text: v, style: const TextStyle(color: AkashiColors.textPrimary)),
-          ],
+    text: TextSpan(
+      style: const TextStyle(
+        fontFamily: 'monospace',
+        fontFamilyFallback: kMonoFontFamilyFallback,
+        fontSize: 12.5,
+      ),
+      children: [
+        TextSpan(
+          text: '$k: ',
+          style: const TextStyle(color: AkashiColors.textFaint),
         ),
-      );
+        TextSpan(
+          text: v,
+          style: const TextStyle(color: AkashiColors.textPrimary),
+        ),
+      ],
+    ),
+  );
 }
 
 class _StatusBadge extends StatelessWidget {
@@ -248,9 +267,14 @@ class _StatusBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(6),
         border: Border.all(color: color.withValues(alpha: 0.6)),
       ),
-      child: Text(label,
-          style: TextStyle(
-              color: color, fontSize: 11, fontWeight: FontWeight.w700)),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: color,
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
     );
   }
 }
@@ -273,20 +297,28 @@ class _PhaseNarrative extends StatelessWidget {
         'This is a brand-new `AgentController` + agent — a fresh “process”. The '
             'original is gone, but the checkpoint survived in the store. Approve '
             'or deny to `resume(checkpointId, decision:)` from it.',
-      _Phase.done => 'Resumed from the persisted checkpoint and ran to '
-          'completion — across a (simulated) process restart.',
+      _Phase.done =>
+        'Resumed from the persisted checkpoint and ran to '
+            'completion — across a (simulated) process restart.',
     };
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Icon(Icons.arrow_right_alt, size: 18, color: AkashiColors.primary),
+        const Icon(
+          Icons.arrow_right_alt,
+          size: 18,
+          color: AkashiColors.primary,
+        ),
         const SizedBox(width: 8),
         Expanded(
-          child: Text(text,
-              style: const TextStyle(
-                  fontSize: 13.5,
-                  height: 1.5,
-                  color: AkashiColors.textSecondary)),
+          child: Text(
+            text,
+            style: const TextStyle(
+              fontSize: 13.5,
+              height: 1.5,
+              color: AkashiColors.textSecondary,
+            ),
+          ),
         ),
       ],
     );
@@ -316,7 +348,10 @@ class _ResultPanel extends StatelessWidget {
       child: Text(
         controller.isRunning && text.isEmpty ? 'Resuming…' : text,
         style: const TextStyle(
-            color: AkashiColors.textPrimary, fontSize: 14, height: 1.5),
+          color: AkashiColors.textPrimary,
+          fontSize: 14,
+          height: 1.5,
+        ),
       ),
     );
   }
@@ -345,35 +380,35 @@ class _Actions extends StatelessWidget {
   Widget build(BuildContext context) {
     return switch (phase) {
       _Phase.idle => FilledButton.icon(
-          onPressed: busy ? null : onStart,
-          icon: const Icon(Icons.play_arrow_rounded, size: 18),
-          label: const Text('Start refund job'),
-        ),
+        onPressed: busy ? null : onStart,
+        icon: const Icon(Icons.play_arrow_rounded, size: 18),
+        label: const Text('Start refund job'),
+      ),
       _Phase.suspended => OutlinedButton.icon(
-          onPressed: busy ? null : onRestart,
-          icon: const Icon(Icons.restart_alt, size: 18),
-          label: const Text('Simulate process restart'),
-        ),
+        onPressed: busy ? null : onRestart,
+        icon: const Icon(Icons.restart_alt, size: 18),
+        label: const Text('Simulate process restart'),
+      ),
       _Phase.restarted => Row(
-          children: [
-            FilledButton.icon(
-              onPressed: busy ? null : onApprove,
-              icon: const Icon(Icons.check, size: 16),
-              label: const Text('Approve & resume'),
-            ),
-            const SizedBox(width: 10),
-            OutlinedButton.icon(
-              onPressed: busy ? null : onDeny,
-              icon: const Icon(Icons.close, size: 16),
-              label: const Text('Deny & resume'),
-            ),
-          ],
-        ),
+        children: [
+          FilledButton.icon(
+            onPressed: busy ? null : onApprove,
+            icon: const Icon(Icons.check, size: 16),
+            label: const Text('Approve & resume'),
+          ),
+          const SizedBox(width: 10),
+          OutlinedButton.icon(
+            onPressed: busy ? null : onDeny,
+            icon: const Icon(Icons.close, size: 16),
+            label: const Text('Deny & resume'),
+          ),
+        ],
+      ),
       _Phase.done => OutlinedButton.icon(
-          onPressed: busy ? null : onReset,
-          icon: const Icon(Icons.replay, size: 18),
-          label: const Text('Reset demo'),
-        ),
+        onPressed: busy ? null : onReset,
+        icon: const Icon(Icons.replay, size: 18),
+        label: const Text('Reset demo'),
+      ),
     };
   }
 }
