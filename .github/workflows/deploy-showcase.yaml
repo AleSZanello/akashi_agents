@@ -37,11 +37,14 @@ jobs:
       - run: flutter test
       - run: flutter build web --release
 
-      - name: Deploy to Firebase Hosting (live channel)
-        uses: FirebaseExtended/action-hosting-deploy@v0
-        with:
-          repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_AKASHI_AGENTS }}
-          projectId: akashi-agents
-          channelId: live
-          entryPoint: examples/web_showcase
+      # Deploy with the Firebase CLI directly (via the service account as ADC).
+      # The plain `deploy` path handles unchanged content gracefully — unlike the
+      # channel-release API, which rejects re-releasing an identical version.
+      - name: Deploy to Firebase Hosting
+        env:
+          FIREBASE_SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_AKASHI_AGENTS }}
+        run: |
+          printf '%s' "$FIREBASE_SA" > "$RUNNER_TEMP/sa.json"
+          export GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/sa.json"
+          npx -y firebase-tools@latest deploy \
+            --only hosting --project akashi-agents --non-interactive
