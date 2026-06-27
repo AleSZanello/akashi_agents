@@ -52,5 +52,16 @@ jobs:
         run: |
           printf '%s' "$FIREBASE_SA" > "$RUNNER_TEMP/sa.json"
           export GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/sa.json"
-          npx -y firebase-tools@latest deploy \
-            --only hosting --project akashi-agents --non-interactive
+          set +e
+          out=$(npx -y firebase-tools@latest deploy \
+            --only hosting --project akashi-agents --non-interactive 2>&1)
+          code=$?
+          echo "$out"
+          # firebase-tools finalizes + promotes the version, then errors on a
+          # redundant release ("is the current active version") even though the
+          # deploy succeeded. Treat only that benign case as success.
+          if [ $code -ne 0 ] && echo "$out" | grep -q "is the current active version"; then
+            echo "::notice::Version already promoted to live — deploy succeeded."
+            exit 0
+          fi
+          exit $code
