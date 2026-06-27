@@ -2,6 +2,11 @@
 
 **A provider-neutral agent framework for Dart & Flutter.**
 
+> 🌐 **Live demos:** [akashi-agents.web.app](https://akashi-agents.web.app) —
+> every pillar (streaming, tools, human-in-the-loop, multi-agent, durable
+> suspend/resume) running in your browser on a fake model. Source:
+> [`examples/web_showcase`](examples/web_showcase).
+
 Most "Agents as a Service" frameworks — Vercel's `eve`/AI SDK, OpenAI Agents SDK,
 Pydantic AI, LangGraph, Mastra — live in Python and TypeScript. Akashi brings the
 same primitives to Dart so the ~80%-Flutter teams of the world can build agents
@@ -49,6 +54,7 @@ OpenAI + Anthropic adapters — all provider-neutral and offline-tested.
 | [`akashi_openai`](packages/akashi_openai) | v0.2 | OpenAI adapter over `openai_dart`. |
 | [`akashi_anthropic`](packages/akashi_anthropic) | v0.2 | Anthropic adapter over `anthropic_sdk_dart` (thinking + tool_use). |
 | [`akashi_gateway`](packages/akashi_gateway) | v0.2 | Model routing (`provider/model` strings) + `FallbackModel` + embedding routing. |
+| [`akashi_workflow`](packages/akashi_workflow) | v0.3 | **Code-driven** multi-agent orchestration: bounded-concurrency fan-out, typed pipelines, retries/backoff, timeouts, cancellation, an event stream. The deterministic complement to the model-driven `Agent.asTool`/handoffs. |
 | [`akashi_mcp`](packages/akashi_mcp) | v0.3 | Model Context Protocol tools over `dart_mcp` 0.5. |
 | [`akashi_otel`](packages/akashi_otel) | v0.2 | OpenTelemetry tracing exporter. |
 | [`akashi_gen`](packages/akashi_gen) | v0.2 | Optional `build_runner` codegen for tool input schemas. |
@@ -58,6 +64,7 @@ OpenAI + Anthropic adapters — all provider-neutral and offline-tested.
 | `akashi_ollama` | stub | Ollama adapter over `ollama_dart`. |
 | [`examples/cli_quickstart`](examples/cli_quickstart) | v0.1 | Streaming Gemini agent that calls a typed tool. |
 | [`examples/production_agent`](examples/production_agent) | v0.2 | Combined example: provider routing, structured output, OTel tracing, approval gate, checkpoints. |
+| [`examples/web_showcase`](examples/web_showcase) | v0.3 | **Flutter web demo site** ([live](https://akashi-agents.web.app)) — every pillar running in-browser on a fake model. Firebase Hosting. |
 
 ## Quick start
 

@@ -81,9 +81,25 @@ class _ChatScreenState extends State<ChatScreen> {
           Expanded(
             child: AgentBuilder<Object?>(
               controller: controller,
-              builder: (context, c) => Padding(
-                padding: const EdgeInsets.all(16),
-                child: Text(c.text.isEmpty ? '…' : c.text),
+              // The committed transcript, plus a live bubble for the streaming
+              // assistant text of the in-flight turn.
+              builder: (context, c) => Column(
+                children: [
+                  Expanded(
+                    child: MessageListView(
+                      messages: c.messages,
+                      padding: const EdgeInsets.all(16),
+                    ),
+                  ),
+                  if (c.isRunning && c.text.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(c.text),
+                      ),
+                    ),
+                ],
               ),
             ),
           ),

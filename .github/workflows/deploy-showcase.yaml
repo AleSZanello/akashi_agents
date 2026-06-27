@@ -1,0 +1,47 @@
+name: Deploy showcase
+
+# Builds the Flutter web showcase and deploys it to Firebase Hosting
+# (project: akashi-agents → https://akashi-agents.web.app / akashi.azanello.com).
+#
+# Requires one repo secret: FIREBASE_SERVICE_ACCOUNT_AKASHI_AGENTS — a Google
+# service-account JSON with the "Firebase Hosting Admin" role. The easiest way to
+# create it (service account + this secret) is to run, once, from the showcase
+# dir: `firebase init hosting:github`. See examples/web_showcase/README.md.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'examples/web_showcase/**'
+      - 'packages/akashi/**'
+      - 'packages/akashi_flutter/**'
+      - '.github/workflows/deploy-showcase.yaml'
+  # Allow manual runs from the Actions tab.
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: examples/web_showcase
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: flutter test
+      - run: flutter build web --release
+
+      - name: Deploy to Firebase Hosting (live channel)
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_AKASHI_AGENTS }}
+          projectId: akashi-agents
+          channelId: live
+          entryPoint: examples/web_showcase

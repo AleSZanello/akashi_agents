@@ -1,0 +1,41 @@
+name: akashi_showcase
+description: "Live, in-browser demos of the Akashi agent framework."
+publish_to: 'none'
+version: 1.0.0+1
+
+# Standalone resolution (NOT a pub-workspace member, like akashi_flutter): it
+# depends on the Flutter SDK and overrides akashi/akashi_flutter onto local
+# source, so it resolves with `flutter pub get` off the workspace's pure-Dart
+# `dart pub get` path.
+environment:
+  sdk: ^3.12.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+
+  # The framework under demo.
+  akashi: ^0.3.0
+  akashi_flutter: ^0.3.0
+  akashi_workflow: ^0.3.0
+
+  # Deep-linkable routing for the demo gallery + external links.
+  go_router: ^14.0.0
+  url_launcher: ^6.3.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+dependency_overrides:
+  akashi:
+    path: ../../packages/akashi
+  akashi_flutter:
+    path: ../../packages/akashi_flutter
+  akashi_workflow:
+    path: ../../packages/akashi_workflow
+
+flutter:
+  uses-material-design: true
