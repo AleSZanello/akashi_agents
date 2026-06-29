@@ -38,6 +38,9 @@ final class OpenAIModel implements LanguageModel, StructuredOutputCapable {
     await for (final event in _client.chat.completions.createStream(
       _toRequest(request),
     )) {
+      // Cooperative cancellation: stop draining the upstream stream if the run
+      // was cancelled (the agent loop also observes the same token).
+      if (request.cancel.isCancelled) break;
       if (event.usage != null) usage = event.usage;
       final choice = event.choices?.firstOrNull;
       if (choice == null) continue;
@@ -118,7 +121,7 @@ final class OpenAIModel implements LanguageModel, StructuredOutputCapable {
         case UserMessage():
           messages.add(
             o.UserMessage(
-              content: o.UserMessageContent.text(_textOf(message.content)),
+              content: o.UserMessageContent.text(partsToText(message.content)),
             ),
           );
         case AssistantMessage():
@@ -145,7 +148,7 @@ final class OpenAIModel implements LanguageModel, StructuredOutputCapable {
               messages.add(
                 o.ToolMessage(
                   toolCallId: part.toolCallId,
-                  content: _stringify(part.output),
+                  content: encodeToolOutput(part.output),
                 ),
               );
             }
@@ -189,12 +192,10 @@ o.ToolChoice? _toToolChoice(ToolChoice choice) => switch (choice.mode) {
   ToolChoiceMode.specific => o.ToolChoice.function(choice.toolName ?? ''),
 };
 
-String _textOf(List<Part> parts) =>
-    parts.whereType<TextPart>().map((p) => p.text).join();
-
-String _stringify(Object? output) =>
-    output is String ? output : jsonEncode(output);
-
+/// Decodes an OpenAI tool-call arguments string into a map. Empty input yields
+/// an empty map; a non-object value is wrapped under `value`; malformed JSON is
+/// preserved under `_raw` so the failure is visible to the tool rather than
+/// silently dropped as an empty map.
 Map<String, Object?> _decodeArgs(String arguments) {
   if (arguments.trim().isEmpty) return {};
   try {
@@ -202,8 +203,8 @@ Map<String, Object?> _decodeArgs(String arguments) {
     return decoded is Map
         ? decoded.cast<String, Object?>()
         : {'value': decoded};
-  } catch (_) {
-    return {};
+  } on FormatException {
+    return {'_raw': arguments};
   }
 }
 
@@ -214,7 +215,11 @@ Usage _toUsage(o.Usage? usage) => usage == null
         outputTokens: usage.completionTokens ?? 0,
       );
 
-FinishReason _toFinish(o.FinishReason? reason) {
-  if (reason == null) return FinishReason.stop;
-  return reason.isTruncated ? FinishReason.length : FinishReason.stop;
-}
+FinishReason _toFinish(o.FinishReason? reason) => switch (reason) {
+  o.FinishReason.length => FinishReason.length,
+  o.FinishReason.toolCalls ||
+  o.FinishReason.functionCall => FinishReason.toolCalls,
+  o.FinishReason.contentFilter => FinishReason.contentFilter,
+  // stop and null both mean a natural end of turn.
+  _ => FinishReason.stop,
+};

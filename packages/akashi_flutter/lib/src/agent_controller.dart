@@ -38,6 +38,10 @@ class PendingApproval {
 /// controller.send('Hello');
 /// ```
 ///
+/// Always [dispose] the controller when the owning widget is removed: this
+/// [stop]s any in-flight run, rejects a pending approval so the agent loop's
+/// future completes instead of hanging, and silences post-dispose notifications.
+///
 /// ## Approval: in-process vs. durable
 ///
 /// The controller resolves either approval style from the same [approve] /
@@ -75,6 +79,11 @@ class AgentController<TDeps> extends ChangeNotifier
 
   /// Optional typed deps passed to each run.
   final TDeps? deps;
+
+  /// The cancellation token of the in-flight run, used by [stop] and [dispose].
+  CancellationToken? _cancel;
+
+  bool _disposed = false;
 
   final List<AgentEvent> _events = [];
 
@@ -120,16 +129,19 @@ class AgentController<TDeps> extends ChangeNotifier
   /// Whether the run is paused on a durable approval (see [suspended]).
   bool get isSuspended => _suspended != null;
 
-  /// Drive a run for [prompt]. A no-op when a run is already in flight or no
-  /// [agent] is attached. Returns when the run finishes (or suspends/errors).
+  /// Drive a run for [prompt]. A no-op when a run is already in flight, no
+  /// [agent] is attached, or the controller is disposed. Returns when the run
+  /// finishes (or suspends/errors).
   ///
   /// The prompt is appended to the [messages] transcript and the agent is driven
   /// over the full history, so successive [send]s form a multi-turn
   /// conversation.
   Future<void> send(Object prompt, {RunOptions? options}) async {
     final target = _agent;
-    if (target == null || _isRunning) return;
+    if (target == null || _isRunning || _disposed) return;
     final turn = _userTurn(prompt);
+    final cancel = options?.cancel ?? CancellationToken();
+    _cancel = cancel;
     _events.clear();
     _text = '';
     _error = null;
@@ -137,20 +149,21 @@ class AgentController<TDeps> extends ChangeNotifier
     _suspended = null;
     _isRunning = true;
     if (turn != null) _messages.addAll(turn);
-    notifyListeners();
+    _notify();
     // For an unsupported prompt shape, defer to the agent's own validation.
     await _consume(
       target.stream(
         turn != null ? _messages : prompt,
         deps: deps,
-        options: options,
+        options: _withCancel(options, cancel),
       ),
     );
   }
 
   /// Resume a suspended durable run from the checkpoint store by [checkpointId],
   /// optionally applying an approval [decision]. A no-op unless the attached
-  /// agent is a [ToolLoopAgent] and no run is in flight.
+  /// agent is a [ToolLoopAgent], no run is in flight, and the controller is
+  /// live.
   ///
   /// Use this after a process restart (a fresh controller with no in-memory
   /// [suspended]); within a live session, [approve] / [reject] resume for you.
@@ -160,21 +173,27 @@ class AgentController<TDeps> extends ChangeNotifier
     RunOptions? options,
   }) async {
     final target = _agent;
-    if (target is! ToolLoopAgent<TDeps> || _isRunning) return;
+    if (target is! ToolLoopAgent<TDeps> || _isRunning || _disposed) return;
+    final cancel = options?.cancel ?? CancellationToken();
+    _cancel = cancel;
     _suspended = null;
     _error = null;
     _pendingApproval = null;
     _isRunning = true;
-    notifyListeners();
+    _notify();
     await _consume(
       target.resume(
         checkpointId,
         decision: decision,
         deps: deps,
-        options: options,
+        options: _withCancel(options, cancel),
       ),
     );
   }
+
+  /// Cancel the in-flight run, if any. Cooperative: the agent loop and the
+  /// provider stream observe the cancellation and wind down. A no-op when idle.
+  void stop() => _cancel?.cancel();
 
   /// Fold an event stream into observable state. Shared by [send] and [resume].
   Future<void> _consume(Stream<AgentEvent> stream) async {
@@ -184,7 +203,7 @@ class AgentController<TDeps> extends ChangeNotifier
         if (event is TextDelta) _text += event.text;
         if (event is ErrorEvent) _error = event.error;
         if (event is StepFinish) _commitStep(event.result);
-        notifyListeners();
+        _notify();
       }
     } on Suspended catch (s) {
       _suspended = s;
@@ -193,7 +212,8 @@ class AgentController<TDeps> extends ChangeNotifier
     } finally {
       _isRunning = false;
       _pendingApproval = null;
-      notifyListeners();
+      _cancel = null;
+      _notify();
     }
   }
 
@@ -218,11 +238,30 @@ class AgentController<TDeps> extends ChangeNotifier
     _ => null,
   };
 
+  /// Returns [options] with [cancel] applied, preserving every other field so a
+  /// caller's overrides survive (a fresh [RunOptions] when none was given).
+  RunOptions _withCancel(RunOptions? options, CancellationToken cancel) =>
+      options == null
+      ? RunOptions(cancel: cancel)
+      : RunOptions(
+          cancel: cancel,
+          temperature: options.temperature,
+          maxOutputTokens: options.maxOutputTokens,
+          maxRepairAttempts: options.maxRepairAttempts,
+          checkpointId: options.checkpointId,
+          responseFormat: options.responseFormat,
+        );
+
   @override
   Future<ApprovalDecision> decide(ToolCallPart call, ToolContext<TDeps> ctx) {
+    if (_disposed) {
+      return Future.value(
+        const ApprovalDecision.rejected('controller disposed'),
+      );
+    }
     final completer = Completer<ApprovalDecision>();
     _pendingApproval = PendingApproval(call, completer);
-    notifyListeners();
+    _notify();
     return completer.future;
   }
 
@@ -240,12 +279,32 @@ class AgentController<TDeps> extends ChangeNotifier
     if (pending != null) {
       pending._resolve(decision);
       _pendingApproval = null;
-      notifyListeners();
+      _notify();
       return;
     }
     final paused = _suspended;
     if (paused != null) {
       unawaited(resume(paused.checkpointId, decision: decision));
     }
+  }
+
+  /// Notify listeners unless the controller has been disposed — guards the
+  /// streamed `notifyListeners` from firing after [dispose] (which would throw).
+  void _notify() {
+    if (!_disposed) notifyListeners();
+  }
+
+  /// Tears the controller down: cancels any in-flight run, rejects a pending
+  /// in-process approval so the agent loop's future completes instead of
+  /// hanging, and stops further notifications. Call from `State.dispose`.
+  @override
+  void dispose() {
+    _disposed = true;
+    _cancel?.cancel();
+    _pendingApproval?._resolve(
+      const ApprovalDecision.rejected('controller disposed'),
+    );
+    _pendingApproval = null;
+    super.dispose();
   }
 }

@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:akashi/akashi.dart';
 import 'package:anthropic_sdk_dart/anthropic_sdk_dart.dart' as a;
 
@@ -41,6 +39,9 @@ final class ClaudeModel implements LanguageModel, StructuredOutputCapable {
     await for (final event in _client.messages.createStream(
       _toRequest(request),
     )) {
+      // Cooperative cancellation: stop draining the upstream stream if the run
+      // was cancelled (the agent loop also observes the same token).
+      if (request.cancel.isCancelled) break;
       switch (event) {
         case a.MessageStartEvent(:final message):
           inputTokens = message.usage.inputTokens;
@@ -138,8 +139,14 @@ final class ClaudeModel implements LanguageModel, StructuredOutputCapable {
         case SystemMessage(:final text):
           systemTexts.add(text);
         case UserMessage():
-          messages.add(a.InputMessage.user(_textOf(message.content)));
+          messages.add(a.InputMessage.user(partsToText(message.content)));
         case AssistantMessage():
+          // NOTE: a captured [ReasoningPart] (Anthropic "thinking") is not
+          // replayed here. anthropic_sdk_dart 5 has no thinking *input* block,
+          // and Akashi does not yet enable extended thinking on a request, so
+          // there is no signed thinking block to round-trip. When a thinking
+          // config is exposed, emit the thinking block (with its signature)
+          // first, ahead of text and tool_use, in this branch.
           final blocks = <a.InputContentBlock>[];
           final text = message.text;
           if (text.isNotEmpty) blocks.add(a.InputContentBlock.text(text));
@@ -163,7 +170,7 @@ final class ClaudeModel implements LanguageModel, StructuredOutputCapable {
               if (part is ToolResultPart)
                 a.InputContentBlock.toolResultText(
                   toolUseId: part.toolCallId,
-                  text: _stringify(part.output),
+                  text: encodeToolOutput(part.output),
                   isError: part.isError,
                 ),
           ];
@@ -207,13 +214,11 @@ a.ToolChoice? _toToolChoice(ToolChoice choice) => switch (choice.mode) {
   ToolChoiceMode.specific => a.ToolChoice.tool(choice.toolName ?? ''),
 };
 
-String _textOf(List<Part> parts) =>
-    parts.whereType<TextPart>().map((p) => p.text).join();
-
-String _stringify(Object? output) =>
-    output is String ? output : jsonEncode(output);
-
 FinishReason _toFinish(a.StopReason? reason) => switch (reason) {
-  a.StopReason.maxTokens => FinishReason.length,
+  a.StopReason.maxTokens ||
+  a.StopReason.modelContextWindowExceeded => FinishReason.length,
+  a.StopReason.toolUse => FinishReason.toolCalls,
+  a.StopReason.refusal => FinishReason.contentFilter,
+  // endTurn, stopSequence, pauseTurn, compaction, and null are natural stops.
   _ => FinishReason.stop,
 };

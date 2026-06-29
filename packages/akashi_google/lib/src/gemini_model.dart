@@ -36,6 +36,9 @@ final class GeminiModel implements LanguageModel, StructuredOutputCapable {
     );
 
     await for (final chunk in stream) {
+      // Cooperative cancellation: stop draining the upstream stream if the run
+      // was cancelled (the agent loop also observes the same token).
+      if (request.cancel.isCancelled) break;
       if (chunk.usageMetadata != null) lastUsage = chunk.usageMetadata;
       final candidates = chunk.candidates ?? const [];
       if (candidates.isEmpty) continue;
@@ -258,8 +261,19 @@ Usage _toUsage(g.UsageMetadata? usage) => usage == null
       );
 
 FinishReason _toFinish(g.FinishReason? reason) => switch (reason) {
-      g.FinishReason.stop => FinishReason.stop,
       g.FinishReason.maxTokens => FinishReason.length,
-      null => FinishReason.stop,
+      g.FinishReason.safety ||
+      g.FinishReason.recitation ||
+      g.FinishReason.blocklist ||
+      g.FinishReason.prohibitedContent ||
+      g.FinishReason.spii ||
+      g.FinishReason.imageSafety ||
+      g.FinishReason.imageProhibitedContent ||
+      g.FinishReason.imageRecitation =>
+        FinishReason.contentFilter,
+      g.FinishReason.stop ||
+      g.FinishReason.unspecified ||
+      null =>
+        FinishReason.stop,
       _ => FinishReason.other,
     };

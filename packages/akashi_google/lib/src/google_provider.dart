@@ -9,19 +9,24 @@ import 'gemini_model.dart';
 /// ```dart
 /// final provider = GoogleProvider(apiKey: Platform.environment['GEMINI_API_KEY']!);
 /// final model = provider.languageModel('gemini-2.5-flash');
+/// // ... use the agent ...
+/// provider.close(); // release the shared HTTP connection when done
 /// ```
 final class GoogleProvider implements Provider, EmbeddingProvider {
   /// Creates a provider from an [apiKey]. An existing [client] may be injected
-  /// (e.g. for Vertex AI configuration or testing).
+  /// (e.g. for Vertex AI configuration or testing); when injected, you own its
+  /// lifecycle and [close] leaves it open.
   GoogleProvider({required String apiKey, g.GoogleAIClient? client})
       : _client = client ??
             g.GoogleAIClient(
               config: g.GoogleAIConfig(
                 authProvider: g.ApiKeyProvider(apiKey),
               ),
-            );
+            ),
+        _ownsClient = client == null;
 
   final g.GoogleAIClient _client;
+  final bool _ownsClient;
 
   @override
   String get id => 'google';
@@ -33,4 +38,11 @@ final class GoogleProvider implements Provider, EmbeddingProvider {
   @override
   EmbeddingModel? embeddingModel(String modelId) =>
       GeminiEmbeddingModel(client: _client, modelId: modelId);
+
+  /// Closes the shared underlying client, releasing its HTTP connection. A
+  /// no-op when an external [client] was injected — that one's lifecycle is
+  /// yours.
+  void close() {
+    if (_ownsClient) _client.close();
+  }
 }

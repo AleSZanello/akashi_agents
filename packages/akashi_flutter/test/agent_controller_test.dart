@@ -251,6 +251,32 @@ void main() {
     expect(controller.messages.whereType<ToolMessage>(), isNotEmpty);
   });
 
+  test(
+    'dispose() rejects a pending approval and silences notifications',
+    () async {
+      final controller = AgentController<Object?>();
+      controller.agent = ToolLoopAgent<Object?>(
+        model: _toolThenText('danger', 'done'),
+        tools: [dangerTool()],
+        approvalHandler: controller,
+      );
+
+      final run = controller.send('go');
+      // Let the run reach the in-process approval gate.
+      while (controller.pendingApproval == null) {
+        await Future<void>.delayed(const Duration(milliseconds: 1));
+      }
+
+      // Disposing mid-run must not throw: it rejects the pending approval so the
+      // loop unblocks, and the still-draining stream must not call
+      // notifyListeners after dispose (which would throw a FlutterError and
+      // surface as an error on the run future).
+      controller.dispose();
+      await expectLater(run, completes);
+      expect(controller.isRunning, isFalse);
+    },
+  );
+
   test('approve() resumes a durable suspension', () async {
     final store = InMemoryCheckpointStore();
     final controller = AgentController<Object?>();

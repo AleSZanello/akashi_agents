@@ -34,6 +34,8 @@ class GemmaModel implements LanguageModel {
       request.messages,
       tools: request.tools,
     )) {
+      // On-device generation can be long; stop draining if the run is cancelled.
+      if (request.cancel.isCancelled) break;
       switch (chunk) {
         case GemmaTextChunk(:final text):
           yield TextDeltaPart(text);

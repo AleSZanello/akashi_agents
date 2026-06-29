@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import '../messages/message.dart';
 import '../util/cancellation.dart';
 import 'usage.dart';
@@ -278,3 +280,22 @@ final class UsagePart extends ModelStreamPart {
   /// The reported usage.
   final Usage usage;
 }
+
+// ---------------------------------------------------------------------------
+// Adapter helpers
+//
+// Small utilities shared by the first-party provider adapters and offered to
+// anyone writing their own: map an Akashi message onto a provider's wire shape.
+// ---------------------------------------------------------------------------
+
+/// Flattens [parts] to plain text by concatenating every [TextPart] and
+/// dropping the rest. A convenience for provider adapters mapping an Akashi
+/// message onto a provider field that only accepts text.
+String partsToText(List<Part> parts) =>
+    parts.whereType<TextPart>().map((p) => p.text).join();
+
+/// Encodes a tool result [output] for sending back to a model: a [String] is
+/// returned as-is, anything else is JSON-encoded. Used by provider adapters to
+/// fill a tool-result message's text field.
+String encodeToolOutput(Object? output) =>
+    output is String ? output : jsonEncode(output);
