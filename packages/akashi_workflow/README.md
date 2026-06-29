@@ -9,7 +9,7 @@ off. `akashi_workflow` is the complement: **code-driven** orchestration where
 production concerns.
 
 > 🔬 Live demo: the **Workflow pipeline** demo at
-> [akashi-agents.web.app](https://akashi-agents.web.app/demos/workflow-pipeline).
+> [akashi.azanello.com](https://akashi.azanello.com/demos/workflow-pipeline).
 
 ## What it gives you
 

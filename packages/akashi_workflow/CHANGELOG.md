@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.1
+
+- Docs: live-demo link now points to https://akashi.azanello.com (the canonical
+  custom domain). No code or API changes.
+
 ## 0.3.0
 
 - Initial release of deterministic, code-driven multi-agent orchestration.

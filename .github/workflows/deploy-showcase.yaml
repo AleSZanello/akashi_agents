@@ -1,7 +1,7 @@
 name: Deploy showcase
 
 # Builds the Flutter web showcase and deploys it to Firebase Hosting
-# (project: akashi-agents → https://akashi-agents.web.app / akashi.azanello.com).
+# (project: akashi-agents → https://akashi.azanello.com).
 #
 # Requires one repo secret: FIREBASE_SERVICE_ACCOUNT_AKASHI_AGENTS — a Google
 # service-account JSON with the "Firebase Hosting Admin" role. The easiest way to

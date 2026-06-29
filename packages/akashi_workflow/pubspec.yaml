@@ -3,7 +3,7 @@ description: >-
   Deterministic, code-driven multi-agent orchestration for Akashi:
   bounded-concurrency fan-out, typed pipelines, retries with backoff, timeouts,
   cancellation, and an event stream.
-version: 0.3.0
+version: 0.3.1
 repository: https://github.com/AleSZanello/akashi_agents/tree/main/packages/akashi_workflow
 issue_tracker: https://github.com/AleSZanello/akashi_agents/issues
 topics:

@@ -2,10 +2,9 @@
 
 **A provider-neutral agent framework for Dart & Flutter.**
 
-> 🌐 **Live demos:** [akashi.azanello.com](https://akashi.azanello.com)
-> (also at [akashi-agents.web.app](https://akashi-agents.web.app)) — every pillar
-> (streaming, tools, human-in-the-loop, multi-agent, durable suspend/resume)
-> running in your browser on a fake model. Source:
+> 🌐 **Live demos:** [akashi.azanello.com](https://akashi.azanello.com) — every
+> pillar (streaming, tools, human-in-the-loop, multi-agent, durable
+> suspend/resume) running in your browser on a fake model. Source:
 > [`examples/web_showcase`](examples/web_showcase).
 
 Most "Agents as a Service" frameworks — Vercel's `eve`/AI SDK, OpenAI Agents SDK,

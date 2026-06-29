@@ -5,8 +5,7 @@ the analog of Bonfire's demo site. Every demo runs entirely client-side on a
 scripted **fake model** (`ScriptedModel`), so there are **no API keys and no
 backend**.
 
-🌐 **Live:** https://akashi-agents.web.app (custom domain:
-`akashi.azanello.com`, see below)
+🌐 **Live:** https://akashi.azanello.com
 
 ## Demos
 
@@ -86,14 +85,8 @@ download a JSON key, and `gh secret set FIREBASE_SERVICE_ACCOUNT_AKASHI_AGENTS
 
 ## Custom domain — `akashi.azanello.com`
 
-Custom domains require DNS verification, so they're connected once via the
-console (not scriptable):
-
-1. Firebase Console → **Hosting** → **Add custom domain** → `akashi.azanello.com`.
-2. Add the **TXT** record Firebase shows to the `azanello.com` DNS zone to verify
-   ownership.
-3. Add the **A records** (or the provided `CNAME`) Firebase shows for
-   `akashi` → Firebase Hosting. SSL is provisioned automatically (can take up to
-   ~24h).
-
-Until then the site is reachable at `https://akashi-agents.web.app`.
+The site is **live at https://akashi.azanello.com** (the Firebase default
+`akashi-agents.web.app` also resolves). The custom domain was connected once via
+the Firebase Console — DNS verification isn't scriptable: **Hosting → Add custom
+domain → `akashi.azanello.com`**, then the **TXT** (ownership) and **A** / `CNAME`
+records on the `azanello.com` DNS zone; Firebase provisions SSL automatically.
