@@ -2,9 +2,10 @@
 
 **A provider-neutral agent framework for Dart & Flutter.**
 
-> 🌐 **Live demos:** [akashi-agents.web.app](https://akashi-agents.web.app) —
-> every pillar (streaming, tools, human-in-the-loop, multi-agent, durable
-> suspend/resume) running in your browser on a fake model. Source:
+> 🌐 **Live demos:** [akashi.azanello.com](https://akashi.azanello.com)
+> (also at [akashi-agents.web.app](https://akashi-agents.web.app)) — every pillar
+> (streaming, tools, human-in-the-loop, multi-agent, durable suspend/resume)
+> running in your browser on a fake model. Source:
 > [`examples/web_showcase`](examples/web_showcase).
 
 Most "Agents as a Service" frameworks — Vercel's `eve`/AI SDK, OpenAI Agents SDK,
@@ -64,7 +65,7 @@ OpenAI + Anthropic adapters — all provider-neutral and offline-tested.
 | `akashi_ollama` | stub | Ollama adapter over `ollama_dart`. |
 | [`examples/cli_quickstart`](examples/cli_quickstart) | v0.1 | Streaming Gemini agent that calls a typed tool. |
 | [`examples/production_agent`](examples/production_agent) | v0.2 | Combined example: provider routing, structured output, OTel tracing, approval gate, checkpoints. |
-| [`examples/web_showcase`](examples/web_showcase) | v0.3 | **Flutter web demo site** ([live](https://akashi-agents.web.app)) — every pillar running in-browser on a fake model. Firebase Hosting. |
+| [`examples/web_showcase`](examples/web_showcase) | v0.3 | **Flutter web demo site** ([akashi.azanello.com](https://akashi.azanello.com)) — every pillar running in-browser on a fake model. Firebase Hosting. |
 
 ## Quick start
 

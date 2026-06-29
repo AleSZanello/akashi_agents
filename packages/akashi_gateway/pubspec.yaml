@@ -1,9 +1,9 @@
 name: akashi_gateway
 description: >-
-  Model routing and provider fallback for the Akashi agent framework. Resolve
-  "provider/model" strings via a ProviderRegistry and build resilient
-  FallbackModel chains, all behind Akashi's LanguageModel contract.
-version: 0.2.0
+  Model routing and provider fallback for the Akashi agent framework: resolve
+  "provider/model" strings and build resilient FallbackModel chains behind one
+  LanguageModel contract.
+version: 0.3.0
 repository: https://github.com/Alezanello/akashi_agents/tree/main/packages/akashi_gateway
 issue_tracker: https://github.com/Alezanello/akashi_agents/issues
 topics:

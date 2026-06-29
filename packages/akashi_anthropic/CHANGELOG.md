@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.3.0
+
+- Coordinated 0.3.0 release (tracks `akashi` 0.3.0).
+- `AnthropicProvider.close()` releases the shared HTTP client (a no-op when an
+  external client was injected).
+- Complete `FinishReason` mapping: `tool_use` → `toolCalls` and `refusal` →
+  `contentFilter`, instead of collapsing everything but `max_tokens` to `stop`.
+- Streaming now honors `request.cancel`, stopping the upstream drain on
+  cancellation.
+- Uses the shared `partsToText` / `encodeToolOutput` helpers from `akashi` core.
+
 ## 0.2.0
 
 Initial release — Anthropic (Claude) provider adapter over `anthropic_sdk_dart`.

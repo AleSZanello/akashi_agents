@@ -14,6 +14,10 @@
     (instead of a live `pendingApproval`). `approve()` / `reject()` resume it
     from the checkpoint store, and `resume(checkpointId, decision: …)` resumes a
     suspension out of band (e.g. after a process restart).
+  - Lifecycle: `dispose()` cancels the in-flight run, rejects a pending
+    in-process approval so the agent loop completes instead of hanging, and
+    silences post-dispose notifications; `stop()` cancels a run without
+    disposing.
 - `AgentBuilder` — rebuilds on controller changes.
 - `MessageListView` — renders `Message`/`Part` exhaustively (text, reasoning,
   tool-call chips, results, media stubs).

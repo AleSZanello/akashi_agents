@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.0
+
+- Coordinated 0.3.0 release (tracks `akashi` 0.3.0). No functional changes.
+
 ## 0.2.0
 
 Initial release — optional `build_runner` codegen for tool-input schemas.

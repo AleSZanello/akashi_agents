@@ -14,9 +14,9 @@ resolution: workspace
 
 dependencies:
   akashi: ^0.3.0
-  akashi_anthropic: ^0.2.0
-  akashi_gateway: ^0.2.0
-  akashi_google: ^0.2.0
-  akashi_openai: ^0.2.0
-  akashi_otel: ^0.2.0
+  akashi_anthropic: ^0.3.0
+  akashi_gateway: ^0.3.0
+  akashi_google: ^0.3.0
+  akashi_openai: ^0.3.0
+  akashi_otel: ^0.3.0
   opentelemetry: ^0.18.11

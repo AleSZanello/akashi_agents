@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.3.0
+
+- Coordinated 0.3.0 release (tracks `akashi` 0.3.0).
+- `GoogleProvider.close()` releases the shared HTTP client (a no-op when an
+  external client was injected).
+- Complete `FinishReason` mapping: the safety / recitation / blocklist family
+  now surfaces as `contentFilter` instead of `other`.
+- Streaming now honors `request.cancel`, stopping the upstream drain on
+  cancellation.
+
 ## 0.2.0
 
 - Structured output: `GeminiModel` declares `StructuredOutputCapable`

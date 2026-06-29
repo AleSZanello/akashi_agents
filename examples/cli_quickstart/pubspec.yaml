@@ -12,5 +12,5 @@ resolution: workspace
 
 dependencies:
   akashi: ^0.3.0
-  akashi_gateway: ^0.2.0
-  akashi_google: ^0.2.0
+  akashi_gateway: ^0.3.0
+  akashi_google: ^0.3.0

@@ -25,6 +25,9 @@ extension).
   instead of blocking; `resume(checkpointId, decision: ...)` re-enters the
   suspended step. `AgentCheckpoint` gains additive `pendingApproval`,
   `resolvedResults`, and `status` (`CheckpointStatus`) fields.
+- **Adapter helpers** — `partsToText` (flatten a message's parts to text) and
+  `encodeToolOutput` (string-or-JSON-encode a tool result), shared by the
+  first-party provider adapters and available to anyone writing their own.
 
 ## 0.2.0
 

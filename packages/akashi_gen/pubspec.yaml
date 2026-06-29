@@ -1,9 +1,9 @@
 name: akashi_gen
 description: >-
-  Optional build_runner code generation for Akashi tool input schemas. Emits the
-  same Schema<T> type as the runtime builder, from annotated classes, so the two
-  are drop-in interchangeable. Never a dependency of the akashi core.
-version: 0.2.0
+  Optional build_runner codegen for Akashi tool input schemas: emits the same
+  Schema<T> as the runtime builder from annotated classes, so the two are
+  drop-in interchangeable.
+version: 0.3.0
 repository: https://github.com/Alezanello/akashi_agents/tree/main/packages/akashi_gen
 issue_tracker: https://github.com/Alezanello/akashi_agents/issues
 topics:
@@ -21,7 +21,6 @@ dependencies:
   akashi: ^0.3.0
   analyzer: ^8.0.0
   build: ^4.0.0
-  meta: ^1.16.0
   source_gen: ^4.0.0
 
 dev_dependencies:
