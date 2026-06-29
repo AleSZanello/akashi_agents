@@ -1,6 +1,6 @@
 # akashi_mcp
 
-**Model Context Protocol (MCP)** tools for the [Akashi](https://github.com/Alezanello/akashi_agents)
+**Model Context Protocol (MCP)** tools for the [Akashi](https://github.com/AleSZanello/akashi_agents)
 agent framework. Connects to an MCP server via the official
 [`dart_mcp`](https://pub.dev/packages/dart_mcp) client and exposes its tools as
 Akashi `Tool`s an agent can call.

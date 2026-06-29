@@ -1,6 +1,6 @@
 # akashi_drift
 
-**Durable SQLite checkpoint store** for the [Akashi](https://github.com/Alezanello/akashi_agents)
+**Durable SQLite checkpoint store** for the [Akashi](https://github.com/AleSZanello/akashi_agents)
 agent framework. Implements Akashi's `CheckpointStore` over
 [`drift`](https://pub.dev/packages/drift), persisting agent state so a run can
 **suspend** for human-in-the-loop approval and **resume across process restarts**

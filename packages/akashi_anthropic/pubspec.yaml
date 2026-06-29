@@ -4,8 +4,8 @@ description: >-
   anthropic_sdk_dart behind Akashi's LanguageModel contract, normalizing
   text/thinking/tool_use blocks.
 version: 0.3.0
-repository: https://github.com/Alezanello/akashi_agents/tree/main/packages/akashi_anthropic
-issue_tracker: https://github.com/Alezanello/akashi_agents/issues
+repository: https://github.com/AleSZanello/akashi_agents/tree/main/packages/akashi_anthropic
+issue_tracker: https://github.com/AleSZanello/akashi_agents/issues
 topics:
   - ai
   - agents

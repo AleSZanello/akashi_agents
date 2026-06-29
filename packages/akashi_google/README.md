@@ -1,6 +1,6 @@
 # akashi_google
 
-Google **Gemini** provider adapter for the [Akashi](https://github.com/Alezanello/akashi_agents)
+Google **Gemini** provider adapter for the [Akashi](https://github.com/AleSZanello/akashi_agents)
 agent framework. Wraps [`googleai_dart`](https://pub.dev/packages/googleai_dart)
 behind Akashi's `LanguageModel` contract.
 

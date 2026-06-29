@@ -1,6 +1,6 @@
 # akashi_gateway
 
-Model routing and provider fallback for the [Akashi](https://github.com/Alezanello/akashi_agents)
+Model routing and provider fallback for the [Akashi](https://github.com/AleSZanello/akashi_agents)
 agent framework.
 
 This is a thin **runtime routing layer** that sits on top of Akashi's

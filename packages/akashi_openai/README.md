@@ -1,6 +1,6 @@
 # akashi_openai
 
-**OpenAI** provider adapter for the [Akashi](https://github.com/Alezanello/akashi_agents)
+**OpenAI** provider adapter for the [Akashi](https://github.com/AleSZanello/akashi_agents)
 agent framework. Wraps [`openai_dart`](https://pub.dev/packages/openai_dart)
 behind Akashi's `LanguageModel` contract, normalizing OpenAI's streamed content
 and index-keyed tool-call argument deltas into Akashi's `ModelStreamPart` union.

@@ -1,6 +1,6 @@
 # akashi_gemma
 
-**On-device** `LanguageModel` for the [Akashi](https://github.com/Alezanello/akashi_agents)
+**On-device** `LanguageModel` for the [Akashi](https://github.com/AleSZanello/akashi_agents)
 agent framework, backed by [`flutter_gemma`](https://pub.dev/packages/flutter_gemma).
 Proves Akashi's `LanguageModel` contract is not HTTP-bound: run agents fully
 offline, or as the primary in a cloud `FallbackModel` (via `akashi_gateway`).

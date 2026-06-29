@@ -1,6 +1,6 @@
 # akashi_gen
 
-**Optional `build_runner` codegen** for [Akashi](https://github.com/Alezanello/akashi_agents)
+**Optional `build_runner` codegen** for [Akashi](https://github.com/AleSZanello/akashi_agents)
 tool input schemas. Annotate a class with `@toolInput` and it emits a `Schema<T>`
 identical to the one the runtime builder produces — so generated and
 hand-written schemas are drop-in interchangeable. The `akashi` core never depends

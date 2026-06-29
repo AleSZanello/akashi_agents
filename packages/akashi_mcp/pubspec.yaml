@@ -4,8 +4,8 @@ description: >-
   an MCP server via dart_mcp and expose its tools as Akashi tools an agent can
   call.
 version: 0.3.0
-repository: https://github.com/Alezanello/akashi_agents/tree/main/packages/akashi_mcp
-issue_tracker: https://github.com/Alezanello/akashi_agents/issues
+repository: https://github.com/AleSZanello/akashi_agents/tree/main/packages/akashi_mcp
+issue_tracker: https://github.com/AleSZanello/akashi_agents/issues
 topics:
   - ai
   - agents

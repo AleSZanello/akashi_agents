@@ -1,6 +1,6 @@
 # akashi
 
-Provider-neutral **core** of the [Akashi](https://github.com/Alezanello/akashi_agents)
+Provider-neutral **core** of the [Akashi](https://github.com/AleSZanello/akashi_agents)
 agent framework for Dart & Flutter. Pure Dart — no provider SDKs, no build step
 required.
 
@@ -76,7 +76,7 @@ await for (final event in agent.stream('Tell me a 3-sentence story.')) {
 
 ## Status
 
-v0.1. See the [repository roadmap](https://github.com/Alezanello/akashi_agents)
+v0.1. See the [repository roadmap](https://github.com/AleSZanello/akashi_agents)
 for multi-agent orchestration and durable execution (v0.2–v0.3).
 
 ## License

@@ -1,6 +1,6 @@
 # akashi_workflow
 
-**Deterministic, code-driven multi-agent orchestration for [Akashi](https://github.com/Alezanello/akashi_agents).**
+**Deterministic, code-driven multi-agent orchestration for [Akashi](https://github.com/AleSZanello/akashi_agents).**
 
 Akashi's built-in multi-agent primitives (`Agent.asTool`, handoffs, escalation)
 are **model-driven** — the *model* decides at runtime whether to delegate or hand

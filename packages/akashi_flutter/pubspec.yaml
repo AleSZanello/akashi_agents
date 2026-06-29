@@ -4,8 +4,8 @@ description: >-
   AgentController, AgentBuilder, message/part renderer, and Isolate offload for
   streaming agents in your UI.
 version: 0.3.0
-repository: https://github.com/Alezanello/akashi_agents/tree/main/packages/akashi_flutter
-issue_tracker: https://github.com/Alezanello/akashi_agents/issues
+repository: https://github.com/AleSZanello/akashi_agents/tree/main/packages/akashi_flutter
+issue_tracker: https://github.com/AleSZanello/akashi_agents/issues
 topics:
   - ai
   - agents

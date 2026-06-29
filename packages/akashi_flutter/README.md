@@ -1,6 +1,6 @@
 # akashi_flutter
 
-Reactive Flutter integration for the [Akashi](https://github.com/Alezanello/akashi_agents)
+Reactive Flutter integration for the [Akashi](https://github.com/AleSZanello/akashi_agents)
 agent framework. Drive an agent from your widgets, render its transcript, and
 keep heavy work off the UI thread.
 

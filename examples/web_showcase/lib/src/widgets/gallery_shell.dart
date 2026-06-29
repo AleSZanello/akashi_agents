@@ -6,7 +6,7 @@ import '../demos/demo.dart';
 import '../demos/registry.dart';
 import '../theme.dart';
 
-const kGithubUrl = 'https://github.com/Alezanello/akashi_agents';
+const kGithubUrl = 'https://github.com/AleSZanello/akashi_agents';
 const kPubUrl = 'https://pub.dev/packages/akashi';
 
 /// The persistent shell: an Akashi-branded sidebar of demos beside [child].

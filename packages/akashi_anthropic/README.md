@@ -1,6 +1,6 @@
 # akashi_anthropic
 
-**Anthropic (Claude)** provider adapter for the [Akashi](https://github.com/Alezanello/akashi_agents)
+**Anthropic (Claude)** provider adapter for the [Akashi](https://github.com/AleSZanello/akashi_agents)
 agent framework. Wraps [`anthropic_sdk_dart`](https://pub.dev/packages/anthropic_sdk_dart)
 behind Akashi's `LanguageModel` contract, normalizing Claude's content blocks
 (text, thinking, `tool_use`) into Akashi's `ModelStreamPart` union.

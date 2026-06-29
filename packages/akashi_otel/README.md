@@ -1,6 +1,6 @@
 # akashi_otel
 
-**OpenTelemetry** tracing for the [Akashi](https://github.com/Alezanello/akashi_agents)
+**OpenTelemetry** tracing for the [Akashi](https://github.com/AleSZanello/akashi_agents)
 agent framework. Implements Akashi's `Tracer` over the
 [`opentelemetry`](https://pub.dev/packages/opentelemetry) package, exporting the
 `agent.run → agent.step → tool.<name>` span tree (with step-index and tool-name
