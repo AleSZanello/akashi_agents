@@ -1,0 +1,38 @@
+name: akashi_state_management_examples
+description: "Wiring an Akashi agent into Riverpod and Bloc state management."
+publish_to: 'none'
+version: 1.0.0+1
+
+# Standalone resolution (NOT a pub-workspace member, like akashi_flutter /
+# web_showcase): it depends on the Flutter SDK and overrides akashi /
+# akashi_flutter onto local source, so it resolves with `flutter pub get`.
+environment:
+  sdk: ^3.12.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # The framework being integrated. akashi is pure Dart (the agent itself);
+  # akashi_flutter is pulled in only to reuse its MessageListView renderer.
+  akashi: ^0.3.0
+  akashi_flutter: ^0.3.0
+
+  # The two state managers these recipes target. Note neither akashi nor
+  # akashi_flutter depends on them — the agent exposes a plain Stream/Future,
+  # which is the universal interface every state manager already consumes.
+  flutter_bloc: ^8.1.6
+  flutter_riverpod: ^3.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+dependency_overrides:
+  akashi:
+    path: ../../packages/akashi
+  akashi_flutter:
+    path: ../../packages/akashi_flutter
+
+flutter:
+  uses-material-design: true

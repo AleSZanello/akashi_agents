@@ -3,6 +3,7 @@ import 'demo.dart';
 import 'durable_demo.dart';
 import 'escalation_demo.dart';
 import 'handoff_demo.dart';
+import 'state_management_demo.dart';
 import 'streaming_chat_demo.dart';
 import 'subagent_demo.dart';
 import 'tool_calling_demo.dart';
@@ -18,6 +19,7 @@ final List<Demo> kDemos = [
   escalationDemo,
   workflowDemo,
   durableDemo,
+  stateManagementDemo,
 ];
 
 /// Look up a demo by its route id, or null.

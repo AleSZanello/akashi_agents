@@ -43,6 +43,70 @@ controller.send('Summarize my unread mail.');
 `send` appends each prompt to `messages` and drives the agent over the full
 history, so successive calls form a multi-turn conversation.
 
+## Bring your own state manager (Riverpod, Bloc, …)
+
+`AgentController` is the batteries-included path for `ChangeNotifier` /
+`provider`. You don't need it for Riverpod or Bloc — the agent is plain
+`package:akashi` and exposes a universal interface: `agent.stream(prompt)` (a
+`Stream<AgentEvent>`) and `agent.run(prompt)` (a `Future<RunResult>`), which
+every state manager already knows how to consume. Hold the agent's state in
+*your* container and reuse `MessageListView` to render the transcript.
+
+The fold is the same regardless of manager: accumulate `TextDelta` text for a
+live bubble, and commit each `StepFinish` step's messages to the transcript —
+exactly what `AgentController` does internally. The example below factors that
+into one framework-agnostic reducer (`startUserTurn` + `foldEvent`) that both
+recipes call.
+
+**Riverpod** — a `Notifier` drives the stream:
+
+```dart
+class ChatNotifier extends Notifier<ChatState> {
+  @override
+  ChatState build() => const ChatState();
+
+  Future<void> send(String prompt) async {
+    final agent = ref.read(agentProvider);
+    state = startUserTurn(state, prompt);
+    try {
+      // Pass the full transcript so each turn carries the prior context.
+      await for (final event in agent.stream(state.messages)) {
+        state = foldEvent(state, event);
+      }
+    } finally {
+      state = state.copyWith(isRunning: false);
+    }
+  }
+}
+```
+
+**Bloc** — a `Cubit` emits the same reduced state:
+
+```dart
+class ChatCubit extends Cubit<ChatState> {
+  ChatCubit(this._agent) : super(const ChatState());
+  final Agent<void> _agent;
+
+  Future<void> send(String prompt) async {
+    emit(startUserTurn(state, prompt));
+    try {
+      await for (final event in _agent.stream(state.messages)) {
+        if (isClosed) return; // The screen was disposed mid-stream.
+        emit(foldEvent(state, event));
+      }
+    } finally {
+      if (!isClosed) emit(state.copyWith(isRunning: false));
+    }
+  }
+}
+```
+
+> One collision to know: Riverpod and akashi both export a `Provider`. In a file
+> that uses Riverpod's, import akashi with `hide Provider`.
+
+A runnable, analyzer-clean app with both recipes (plus behavioral tests) lives in
+[`examples/flutter_state_management`](../../examples/flutter_state_management).
+
 ## Approval: in-process vs. durable
 
 Both styles resolve from the same `approve()` / `reject()` call.
