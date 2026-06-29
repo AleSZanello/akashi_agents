@@ -19,6 +19,11 @@ on:
   # Allow manual runs from the Actions tab.
   workflow_dispatch:
 
+# Least privilege: deploy reads the repo and authenticates to Firebase via the
+# service account (not GITHUB_TOKEN), so it needs no write scope on the repo.
+permissions:
+  contents: read
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -53,7 +58,7 @@ jobs:
           printf '%s' "$FIREBASE_SA" > "$RUNNER_TEMP/sa.json"
           export GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/sa.json"
           set +e
-          out=$(npx -y firebase-tools@latest deploy \
+          out=$(npx -y firebase-tools@15 deploy \
             --only hosting --project akashi-agents --non-interactive 2>&1)
           code=$?
           echo "$out"

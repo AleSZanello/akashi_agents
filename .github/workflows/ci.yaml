@@ -5,6 +5,11 @@ on:
     branches: [main]
   pull_request:
 
+# Least privilege: CI only reads the repo (no secrets, no writes). This also
+# hardens fork PRs, whose GITHUB_TOKEN is then read-only.
+permissions:
+  contents: read
+
 jobs:
   # The pure-Dart pub workspace (core + cloud adapters + examples).
   dart-workspace:
