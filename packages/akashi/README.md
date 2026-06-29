@@ -76,8 +76,11 @@ await for (final event in agent.stream('Tell me a 3-sentence story.')) {
 
 ## Status
 
-v0.1. See the [repository roadmap](https://github.com/AleSZanello/akashi_agents)
-for multi-agent orchestration and durable execution (v0.2–v0.3).
+**v0.3** — multi-agent orchestration, durable execution, and Flutter-native
+integration have shipped. See the
+[repository roadmap](https://github.com/AleSZanello/akashi_agents#roadmap) for
+what's done (v0.1–v0.3) and what's planned (v0.4 multi-modal + Ollama, v0.5
+agent-as-MCP-server).
 
 ## License
 

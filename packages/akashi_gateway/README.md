@@ -51,7 +51,7 @@ rethrown.
 
 ## Status
 
-v0.1.
+v0.3.
 
 ## License
 

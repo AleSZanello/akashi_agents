@@ -117,6 +117,10 @@ separate jobs (see `.github/workflows/ci.yaml`).
 - **v0.3** — multi-agent (subagent-as-tool, handoffs, escalation), durable
   execution (`akashi_drift` + suspend/resume HITL), Flutter integration
   (`akashi_flutter`), on-device Gemma (`akashi_gemma`). ← *here*
+- **v0.4** — multi-modal parts end-to-end (image/file through the loop and the
+  provider adapters) + the `akashi_ollama` adapter.
+- **v0.5** — agent-as-MCP-server: expose an Akashi agent over the Model Context
+  Protocol so any MCP client can call it.
 
 ## License
 

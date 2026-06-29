@@ -3,7 +3,7 @@ description: >-
   Google Gemini provider adapter for the Akashi agent framework: wraps
   googleai_dart behind Akashi's LanguageModel contract, with structured output,
   tool calls, and embeddings.
-version: 0.3.0
+version: 0.3.1
 repository: https://github.com/AleSZanello/akashi_agents/tree/main/packages/akashi_google
 issue_tracker: https://github.com/AleSZanello/akashi_agents/issues
 topics:

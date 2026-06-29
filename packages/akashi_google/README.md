@@ -32,7 +32,7 @@ translates between Akashi's provider contract and the Gemini API.
 
 ## Status
 
-v0.1.
+v0.3.
 
 ## License
 

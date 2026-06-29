@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.1
+
+- Docs: README status now reflects v0.3 (was stale at v0.1). No code or API
+  changes.
+
 ## 0.3.0
 
 - Coordinated 0.3.0 release (tracks `akashi` 0.3.0).

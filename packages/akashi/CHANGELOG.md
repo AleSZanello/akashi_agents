@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.1
+
+- Docs: README status now reflects v0.3 (was stale at v0.1) and links the
+  v0.4/v0.5 roadmap. No code or API changes.
+
 ## 0.3.0
 
 Multi-agent + durable-execution milestone (additive; one noted sealed-union

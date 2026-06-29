@@ -87,3 +87,11 @@ stays on the main isolate.
 A runnable reactive chat screen lives in
 [`example/akashi_flutter_example.dart`](example/akashi_flutter_example.dart) —
 swap the scripted model for any provider model and the rest is unchanged.
+
+## Status
+
+v0.3.
+
+## License
+
+MIT.

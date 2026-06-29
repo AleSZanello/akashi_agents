@@ -105,3 +105,11 @@ They compose: a workflow stage can itself run a multi-agent (subagent/handoff)
 
 See [`example/akashi_workflow_example.dart`](example/akashi_workflow_example.dart)
 for a runnable plan → fan-out → synthesize pipeline on fake models.
+
+## Status
+
+v0.3.
+
+## License
+
+MIT.
