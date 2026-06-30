@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.2
+
+- Fix: add a `library;` directive to `src/transport/http_client_factory.dart` so
+  its file-level doc comment is no longer a dangling library doc comment
+  (`dangling_library_doc_comments`, part of `package:lints/core.yaml`). Restores
+  full marks on pub.dev's static-analysis score. No code or API changes.
+
 ## 0.3.1
 
 - Docs: README status now reflects v0.3 (was stale at v0.1) and links the

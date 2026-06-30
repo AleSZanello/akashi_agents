@@ -15,3 +15,6 @@ linter:
     - unnecessary_this
     - directives_ordering
     - avoid_relative_lib_imports
+    # Part of package:lints/core.yaml, which pub.dev's analysis enforces — keep
+    # it on here so local analysis matches the pub.dev score.
+    - dangling_library_doc_comments

@@ -3,5 +3,7 @@
 /// the default client cannot stream response bodies).
 ///
 /// Selected via conditional import so the same agent code streams everywhere.
+library;
+
 export 'http_client_io.dart'
     if (dart.library.js_interop) 'http_client_web.dart';

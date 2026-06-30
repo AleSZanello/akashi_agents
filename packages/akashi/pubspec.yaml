@@ -3,7 +3,7 @@ description: >-
   Provider-neutral core for the Akashi agent framework: streaming tool-loop
   agents, typed tools, sealed message/event unions, multi-agent and
   durable-execution seams. Pure Dart.
-version: 0.3.1
+version: 0.3.2
 repository: https://github.com/AleSZanello/akashi_agents/tree/main/packages/akashi
 issue_tracker: https://github.com/AleSZanello/akashi_agents/issues
 topics:
