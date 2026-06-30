@@ -55,6 +55,7 @@ OpenAI + Anthropic adapters — all provider-neutral and offline-tested.
 | [`akashi_anthropic`](packages/akashi_anthropic) | v0.2 | Anthropic adapter over `anthropic_sdk_dart` (thinking + tool_use). |
 | [`akashi_gateway`](packages/akashi_gateway) | v0.2 | Model routing (`provider/model` strings) + `FallbackModel` + embedding routing. |
 | [`akashi_workflow`](packages/akashi_workflow) | v0.3 | **Code-driven** multi-agent orchestration: bounded-concurrency fan-out, typed pipelines, retries/backoff, timeouts, cancellation, an event stream. The deterministic complement to the model-driven `Agent.asTool`/handoffs. |
+| [`akashi_rag`](packages/akashi_rag) | v0.4 | Retrieval-augmented generation: a provider-neutral `Retriever` seam, a pure-Dart in-memory vector store, document chunking, and retrieval-as-tool. The built-in path reuses core `EmbeddingModel`; external/"standard" RAG backends slot behind the same `Retriever`. |
 | [`akashi_mcp`](packages/akashi_mcp) | v0.3 | Model Context Protocol tools over `dart_mcp` 0.5. |
 | [`akashi_otel`](packages/akashi_otel) | v0.2 | OpenTelemetry tracing exporter. |
 | [`akashi_gen`](packages/akashi_gen) | v0.2 | Optional `build_runner` codegen for tool input schemas. |
@@ -117,7 +118,9 @@ separate jobs (see `.github/workflows/ci.yaml`).
   execution (`akashi_drift` + suspend/resume HITL), Flutter integration
   (`akashi_flutter`), on-device Gemma (`akashi_gemma`). ← *here*
 - **v0.4** — multi-modal parts end-to-end (image/file through the loop and the
-  provider adapters) + the `akashi_ollama` adapter.
+  provider adapters), the `akashi_ollama` adapter, and `akashi_rag` (retrieval —
+  built-in in-memory vector store + retrieval-as-tool, fully additive over the
+  v0.2 `EmbeddingModel` with no core change).
 - **v0.5** — agent-as-MCP-server: expose an Akashi agent over the Model Context
   Protocol so any MCP client can call it.
 

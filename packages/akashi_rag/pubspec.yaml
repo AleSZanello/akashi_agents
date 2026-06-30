@@ -1,0 +1,25 @@
+name: akashi_rag
+description: >-
+  Retrieval-augmented generation for the Akashi agent framework: a
+  provider-neutral Retriever seam, a pure-Dart in-memory vector store, document
+  chunking, and glue to wire retrieval into an agent as a tool.
+version: 0.1.0
+repository: https://github.com/AleSZanello/akashi_agents/tree/main/packages/akashi_rag
+issue_tracker: https://github.com/AleSZanello/akashi_agents/issues
+topics:
+  - ai
+  - agents
+  - rag
+  - embeddings
+  - vector-search
+
+environment:
+  sdk: ^3.6.0
+
+resolution: workspace
+
+dependencies:
+  akashi: ^0.3.0
+
+dev_dependencies:
+  test: ^1.25.0

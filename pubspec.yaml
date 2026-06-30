@@ -27,6 +27,7 @@ workspace:
   - packages/akashi_gateway
   - packages/akashi_otel
   - packages/akashi_workflow
+  - packages/akashi_rag
   - examples/cli_quickstart
   - examples/production_agent
 

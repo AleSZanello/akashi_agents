@@ -50,9 +50,8 @@ class ChatNotifier extends Notifier<ChatState> {
 // ── UI ──────────────────────────────────────────────────────────────────────
 
 /// Run this recipe on its own with `flutter run -t lib/riverpod_example.dart`.
-void main() => runApp(
-  const ProviderScope(child: MaterialApp(home: RiverpodChatScreen())),
-);
+void main() =>
+    runApp(const ProviderScope(child: MaterialApp(home: RiverpodChatScreen())));
 
 class RiverpodChatScreen extends ConsumerStatefulWidget {
   const RiverpodChatScreen({super.key});

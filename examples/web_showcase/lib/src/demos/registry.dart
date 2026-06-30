@@ -3,6 +3,7 @@ import 'demo.dart';
 import 'durable_demo.dart';
 import 'escalation_demo.dart';
 import 'handoff_demo.dart';
+import 'rag_demo.dart';
 import 'state_management_demo.dart';
 import 'streaming_chat_demo.dart';
 import 'subagent_demo.dart';
@@ -13,6 +14,7 @@ import 'workflow_demo.dart';
 final List<Demo> kDemos = [
   streamingChatDemo,
   toolCallingDemo,
+  ragDemo,
   approvalDemo,
   subagentDemo,
   handoffDemo,

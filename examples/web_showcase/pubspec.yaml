@@ -19,6 +19,7 @@ dependencies:
   akashi: ^0.3.0
   akashi_flutter: ^0.3.0
   akashi_workflow: ^0.3.0
+  akashi_rag: ^0.1.0
 
   # Deep-linkable routing for the demo gallery + external links.
   go_router: ^14.0.0
@@ -36,6 +37,8 @@ dependency_overrides:
     path: ../../packages/akashi_flutter
   akashi_workflow:
     path: ../../packages/akashi_workflow
+  akashi_rag:
+    path: ../../packages/akashi_rag
 
 flutter:
   uses-material-design: true
